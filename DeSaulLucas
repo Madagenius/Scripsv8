@@ -1,0 +1,1965 @@
+lblInfo= UI.Label("[[XxSauLxX]]")
+lblInfo:setColor("green")
+lblInfo= UI.Label("-- [[Combos]] --")
+lblInfo:setColor("red")
+
+cpvp = macro(200, "Combo",  function()
+if g_game.isAttacking() then
+say(storage.ComboText)
+say(storage.Combo1Text)
+say(storage.Combo2Text)
+say(storage.Combo3Text)
+say(storage.Combo4Text)
+say(storage.Combo5Text)
+end
+
+end)
+addTextEdit("ComboText", storage.ComboText or "magia 1", function(widget, text) 
+storage.ComboText = text
+end)
+addTextEdit("Combo1Text", storage.Combo1Text or "magia 1", function(widget, text) storage.Combo1Text = text
+end)
+addTextEdit("Combo2Text", storage.Combo2Text or "magia 2", function(widget, text) storage.Combo2Text = text
+end)
+addTextEdit("Combo3Text", storage.Combo3Text or "magia 3", function(widget, text) storage.Combo3Text = text
+end)
+addTextEdit("Combo4Text", storage.Combo4Text or "magia 4", function(widget, text) storage.Combo4Text = text
+end)
+addTextEdit("Combo5Text", storage.Combo5Text or "magia 5", function(widget, text) storage.Combo5Text = text
+end)
+test1 = addIcon("2", {item =2137, text = "C.UP", hotkey = ""}, cpvp)
+test1:breakAnchors()
+test1:move(200, 75)
+
+local combo
+macro(100, "Hibrido", function()
+if g_game.isAttacking() then
+say('')
+say('Hibrido super slash')
+say('Hibrido devastacion')
+end
+end)
+
+local combo
+macro(100, "Fire", function()
+if g_game.isAttacking() then
+say('')
+say('fire devion')
+say('fire devastacion')
+end
+end)
+
+local combo
+macro(100, "Magnus", function()
+if g_game.isAttacking() then
+say('')
+say('Magnus penetracion')
+say('magnus destruction')
+end
+end)
+
+lblInfo= UI.Label("-- [[PvP]] --")
+lblInfo:setColor("yellow")
+UI.Button("Friends", function(newText)
+    UI.MultilineEditorWindow(storage.FriendText or "", {title="Amigos", description="Coloque o nome dos amigos"}, function(text)
+        storage.FriendText = text
+        reload()
+    end)
+end)
+
+isAmigo = function(name)
+    if type(name) ~= 'string' then
+        name = name:getName()
+    end
+    local tabela = storage.FriendText:split('\n')
+    tabela = #tabela > 0 and tabela or false
+    if tabela then
+        return table.find(tabela, name:trim(), true)
+    end
+end
+macro(1, "Enemy", function()
+for _,pla in ipairs(getSpectators(posz())) do
+attacked = g_game.getAttackingCreature()
+  if (not attacked or (attacked and (not attacked:isPlayer() or (pla:getHealthPercent() < attacked:getHealthPercent())))) and pla:isPlayer() and pla:getEmblem() ~= 1 then 
+   g_game.attack(pla)
+  end
+end
+end)
+
+lblInfo= UI.Label("-- [[Auras]] --")
+lblInfo:setColor("yellow")
+
+macro(8000, "Power Up", function()
+  say('Power Up')
+end)
+
+macro(8000, "Mega Power ", function()
+  say('Mega Power Up')
+end)
+
+macro(8000, "Giga Power ", function()
+  say('Giga Power Up')
+end)
+
+macro(8000, " Plation ", function()
+  say('Plation Power Up')
+end)
+
+macro(8000, " Hibrido ", function()
+  say('Hibrido Power Up')
+end)
+
+
+macro(8000, " Fire ", function()
+  say('fire Power Up')
+end)
+
+macro(8000, " Magnus", function()
+  say('Magnus Power Up')
+end)
+
+-- AUTO REVIDE / FIGHT BACK / ATTACK PLAYER PK (REVIDAR)
+
+setDefaultTab("Main")
+
+-- vBot scripting services: F.Almeida#8019
+-- if you like it, consider making a donation:
+-- ATTENTION:
+-- Don't edit below this line unless you know what you're doing.
+-- ATENÃ‡ÃƒO:
+-- NÃ£o mexa em nada daqui para baixo, a nÃ£o ser que saiba o que estÃ¡ fazendo.
+-- ATENCIÃ“N:
+-- No cambies nada desde aquÃ­, solamente si sabes lo que estÃ¡s haciendo.
+
+local ignoreEmblems = {1,4} -- Guild Emblems (Allies)
+
+local ui = setupUI([[
+Panel
+  height: 19
+
+  BotSwitch
+    id: title
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-align: center
+    width: 130
+    !text: tr('Fight Back (Revide)')
+    font: verdana-11px-rounded
+
+  Button
+    id: edit
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 3
+    height: 17
+    text: Setup
+    font: verdana-11px-rounded
+]])
+
+local edit = setupUI([[
+RevideBox < CheckBox
+  font: verdana-11px-rounded
+  margin-top: 5
+  margin-left: 5
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  color: lightGray
+
+Panel
+  height: 123
+
+  RevideBox
+    id: pauseTarget
+    anchors.top: parent.top
+    text: Pause TargetBot 
+    !tooltip: tr('Pause TargetBot While fighting back.')
+
+  RevideBox
+    id: pauseCave
+    text: Pause CaveBot 
+    !tooltip: tr('Pause CaveBot While fighting back.')
+
+  RevideBox
+    id: followTarget
+    text: Follow Target 
+    !tooltip: tr('Set Chase Mode to Follow While fighting back.')
+
+  RevideBox
+    id: ignoreParty
+    text: Ignore Party Members
+
+  RevideBox
+    id: ignoreGuild
+    text: Ignore Guild Members
+
+  RevideBox
+    id: attackAll
+    text: Attack All Skulled
+    !tooltip: tr("Attack every skulled player, even if he didn't attacked you.")
+
+  BotTextEdit
+    id: esc
+    width: 83
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text: Escape
+    color: red
+    font: verdana-11px-rounded
+
+  Label
+    text: Cancel Attack:
+    font: verdana-11px-rounded
+    anchors.left: parent.left
+    margin-left: 5
+    anchors.verticalCenter: esc.verticalCenter
+]])
+edit:hide()
+
+local showEdit = false
+ui.edit.onClick = function(widget)
+  showEdit = not showEdit
+  if showEdit then
+    edit:show()
+  else
+    edit:hide()
+  end
+end
+-- End Basic UI
+
+-- Storage
+local st = "RevideFight"
+storage[st] = storage[st] or {
+  enabled = false,
+  pauseTarget = true,
+  pauseCave = true,
+  followTarget = true,
+  ignoreParty = false,
+  ignoreGuild = false,
+  attackAll = false,
+  esc = "Escape",
+}
+local config = storage[st]
+
+-- UI Functions
+-- Main Button
+ui.title:setOn(config.enabled)
+ui.title.onClick = function(widget)
+  config.enabled = not config.enabled
+  widget:setOn(config.enabled)
+end
+
+-- Checkboxes
+do
+  edit.pauseTarget:setChecked(config.pauseTarget)
+  edit.pauseTarget.onClick = function(widget)
+    config.pauseTarget = not config.pauseTarget
+    widget:setChecked(config.pauseTarget)
+    widget:setImageColor(config.pauseTarget and "green" or "red")
+  end
+  edit.pauseTarget:setImageColor(config.pauseTarget and "green" or "red")
+  
+  edit.pauseCave:setChecked(config.pauseCave)
+  edit.pauseCave.onClick = function(widget)
+    config.pauseCave = not config.pauseCave
+    widget:setChecked(config.pauseCave)
+    widget:setImageColor(config.pauseCave and "green" or "red")
+  end
+  edit.pauseCave:setImageColor(config.pauseCave and "green" or "red")
+
+  edit.followTarget:setChecked(config.followTarget)
+  edit.followTarget.onClick = function(widget)
+    config.followTarget = not config.followTarget
+    widget:setChecked(config.followTarget)
+    widget:setImageColor(config.followTarget and "green" or "red")
+  end
+  edit.followTarget:setImageColor(config.followTarget and "green" or "red")
+
+  edit.ignoreParty:setChecked(config.ignoreParty)
+  edit.ignoreParty.onClick = function(widget)
+    config.ignoreParty = not config.ignoreParty
+    widget:setChecked(config.ignoreParty)
+    widget:setImageColor(config.ignoreParty and "green" or "red")
+  end
+  edit.ignoreParty:setImageColor(config.ignoreParty and "green" or "red")
+
+  edit.ignoreGuild:setChecked(config.ignoreGuild)
+  edit.ignoreGuild.onClick = function(widget)
+    config.ignoreGuild = not config.ignoreGuild
+    widget:setChecked(config.ignoreGuild)
+    widget:setImageColor(config.ignoreGuild and "green" or "red")
+  end
+  edit.ignoreGuild:setImageColor(config.ignoreGuild and "green" or "red")
+
+  edit.attackAll:setChecked(config.attackAll)
+  edit.attackAll.onClick = function(widget)
+    config.attackAll = not config.attackAll
+    widget:setChecked(config.attackAll)
+    widget:setImageColor(config.attackAll and "green" or "red")
+  end
+  edit.attackAll:setImageColor(config.attackAll and "green" or "red")
+end
+
+-- TextEdit
+edit.esc:setText(config.esc)
+edit.esc.onTextChange = function(widget, text)
+  config.esc = text
+end
+edit.esc:setTooltip("Hotkey to cancel attack.")
+
+-- End of setup.
+
+local target = nil
+local c = config
+
+-- Main Loop
+macro(100, function()
+  if not c.enabled then return end
+  if not target then
+    if c.pausedTarget then
+      c.pausedTarget = false
+      TargetBot.setOn()
+    end
+    if c.pausedCave then
+      c.pausedCave = false
+      CaveBot.setOn()
+    end
+    -- Search for attackers
+    local creatures = getSpectators(false)
+    for s, spec in ipairs(creatures) do
+      if spec ~= player and spec:isPlayer() then
+        if (c.attackAll and spec:getSkull() > 2) or spec:isTimedSquareVisible() then
+          if c.ignoreParty or spec:getShield() < 3 then
+            if c.ignoreGuild or not table.find(ignoreEmblems, spec:getEmblem()) then
+              target = spec:getName()
+              break
+            end
+          end
+        end
+      end
+    end
+    return
+  end
+
+  local creature = getPlayerByName(target)
+  if not creature then target = nil return end
+  if c.pauseTargetBot then
+    c.pausedTarget = true
+    TargetBot.setOff()
+  end
+  if c.pauseTarget then
+    c.pausedTarget = true
+    TargetBot.setOff()
+  end
+  if c.pauseCave then
+    c.pausedCave = true
+    CaveBot.setOff()
+  end
+
+  if c.followTarget then
+    g_game.setChaseMode(2)
+  end
+
+  if g_game.isAttacking() then
+    if g_game.getAttackingCreature():getName() == target then
+      return
+    end
+  end
+  g_game.attack(creature)
+end)
+
+onKeyDown(function(keys)
+  if not c.enabled then return end
+  if keys == config.esc then
+    target = nil
+  end
+end)
+
+UI.Separator()
+
+Panels.AttackLeaderTarget(batTab)  UI.Separator()
+
+setDefaultTab("Macros")
+lblInfo= UI.Label("[[XxLuCaSxX]]")
+lblInfo:setColor("green")
+lblInfo= UI.Label("-- [[Auto Compras]] --")
+lblInfo:setColor("yellow")
+
+local bless = false
+macro(1000, "Bless", function()
+    if bless ~= true then
+        bless = true
+      say("!bless")
+    end
+end)
+macro(1000, "Bol", function()
+  if not getFinger() then
+      say('!bol')
+  end
+end)
+
+lblInfo= UI.Label("-- [[Especiales]] --")
+lblInfo:setColor("yellow")
+----------------------------------------------------------------------------------------------------------
+local castBelowHp = 80 -- solamente configurar a la vida que usara el mystic defense y cuando pase del 70% osea 71% o superior usara mystic kai 
+macro(1000, "::.Mystic PVP.::",  function()
+  if (hppercent() <= castBelowHp and not hasManaShield()) then
+    say('Mystic Defense')
+  end
+  if (hppercent() > castBelowHp and hasManaShield()) then
+      say('Mystic kai')
+  end
+end)
+
+
+macro(10, "::.Mystic Defense.::", function()
+    if hppercent() <= 95 then -- % para usar Supreme
+        say('Mystic Defense')
+      end
+ end)
+
+
+
+macro(100, "::.Mystic kai.::", function()
+    if manapercent() <= 90 and alreadyShield then
+        say('mystic kai')
+    end
+end);
+
+onTalk(function(name, level, mode, text, channelId, pos)
+    if name ~= player:getName() then return; end
+    text = text:lower();
+
+    if text == 'alternative defense' then
+        alreadyShield = true;
+    elseif text == 'mystic cancel' then
+        alreadyShield = false;
+    end
+end)
+------------------------------------------------------------------------------------------------------
+macro(10, "::.Reflect.::", function()
+    if hppercent() <= 95 then -- % para usar Supreme
+        say('Reflect')
+      end
+ end)
+
+
+
+lblInfo= UI.Label("-- [[Necesarios]] --")
+lblInfo:setColor("yellow")
+timeSpellPanelName = "timespellbot"
+local ui = setupUI([[
+Panel
+  height: 17
+  BotSwitch
+    id: title
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-align: center
+    width: 130
+    !text: tr('Time Spell')
+  Button
+    id: settings
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 3
+    height: 17
+    text: Setup
+]])
+ui:setId(timeSpellPanelName);
+
+local windowUI = setupUI([[
+MainWindow
+  !text: tr('Time Spell by neoX - Discord: VictorNeox#1947')
+  size: 820 312
+  
+  Panel
+    id: MainPanel
+    image-source: /images/ui/panel_flat
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-border: 6
+    padding: 3
+    size: 492 225
+    
+    TextList
+      id: spellList
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      padding: 1
+      size: 270 212    
+      margin-bottom: 3
+      margin-left: 3
+      vertical-scrollbar: spellListScrollBar
+      
+    VerticalScrollBar
+      id: spellListScrollBar
+      anchors.top: spellList.top
+      anchors.bottom: spellList.bottom
+      anchors.right: spellList.right
+      step: 14
+      pixels-scroll: true
+    Label
+      id: spellNameLabel
+      anchors.left: spellList.right
+      anchors.top: spellList.top
+      text: Spell Name:
+      margin-top: 10
+      margin-left: 7
+    TextEdit
+      id: spellName
+      anchors.left: spellNameLabel.right
+      anchors.top: parent.top
+      margin-top: 5
+      margin-left: 12
+      width: 125
+    Label
+      id: onScreenLabel
+      anchors.left: spellNameLabel.left
+      anchors.top: spellName.bottom
+      margin-top: 10
+      text: On Screen:
+    TextEdit
+      id: onScreen
+      anchors.left: onScreenLabel.right
+      anchors.top: prev.top
+      margin-top: -5
+      margin-left: 17
+      width: 125
+    Label
+      id: activeTimeLabel
+      anchors.left: onScreenLabel.left
+      anchors.top: onScreen.bottom
+      text: Active Time:
+      margin-top: 10
+    TextEdit
+      id: activeTime
+      anchors.left: activeTimeLabel.right
+      anchors.top: prev.top
+      margin-top: -5
+      margin-left: 5
+      width: 125
+    Label
+      id: totalTimeLabel
+      anchors.left: activeTimeLabel.left
+      anchors.top: activeTime.bottom
+      text: Total Time:
+      margin-top: 10
+    TextEdit
+      id: totalTime
+      anchors.left: totalTimeLabel.right
+      anchors.top: prev.top
+      margin-top: -5
+      margin-left: 13
+      width: 125
+    Label
+      id: posXLabel
+      anchors.left: totalTimeLabel.left
+      anchors.top: totalTime.bottom
+      text: X:
+      margin-top: 10
+    TextEdit
+      id: posX
+      anchors.left: posXLabel.right
+      anchors.top: prev.top
+      margin-top: -5
+      margin-left: 68
+      width: 35
+    Label
+      id: posYLabel
+      anchors.left: posX.right
+      anchors.top: posX.top
+      text: Y:
+      margin-top: 5
+      margin-left: 25
+    TextEdit
+      id: posY
+      anchors.left: posYLabel.right
+      anchors.top: prev.top
+      margin-top: -5
+      margin-left: 21
+      width: 35
+    Button
+      id: addSpell
+      anchors.left: spellList.right
+      anchors.bottom: parent.bottom
+      margin-bottom: 2
+      margin-left: 8
+      text: Add
+      size: 200 17
+      font: cipsoftFont
+  VerticalSeparator
+    id: sep
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.bottom: MainPanel.bottom
+    margin-left: 10
+    margin-bottom: 5
+    
+  Label
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text-align: center
+    text: Additional Information
+  HorizontalSeparator
+    anchors.left: prev.left
+    anchors.top: prev.bottom  
+    anchors.right: prev.right
+    margin-top: 5
+    margin-left: 10
+  Label 
+    id: FirstAditionalLabel
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 10
+    margin-left: 5
+    text: *Spell Name: Orange message above the char
+  Label 
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 10
+    text: *On Screen: How it will appear on the screen
+  Label 
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 10
+    text: *Active Time: Total time the spell is active
+  Label 
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 10
+    text: *Total Time: Total Cooldown time
+  Label 
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 10
+    text: *Pos X/Y: Position on the X and Y axis
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 8    
+  Button
+    id: closeButton
+    !text: tr('Close')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5
+      
+]], g_ui.getRootWidget());
+windowUI:hide();
+local configName = modules.game_bot.contentsPanel.config:getCurrentOption().text;
+TimeSpellConfig = {
+    spells = {},
+};
+
+local spellsWidgets = {};
+
+local timeSpellFile = "/bot/" .. configName .. "/".. name() .. "_TimeSpell.json";
+local MainPanel = windowUI.MainPanel;
+
+local editActiveTime = nil;
+local editTotalTime = nil;
+
+if g_resources.fileExists(timeSpellFile) then
+    local status, result = pcall(function() 
+      return json.decode(g_resources.readFileContents(timeSpellFile)) 
+    end)
+    if not status then
+      return onError("Error loading file (" .. timeSpellFile .. "). To fix the problem, delete TimeSpell.json. Details:" .. result)
+    end
+    TimeSpellConfig = result
+    if (type(TimeSpellConfig.spells) ~= 'table') then
+        TimeSpellConfig.spells = {};
+    end
+
+    for i, object in pairs(TimeSpellConfig.spells) do
+        if (object.totalCd - now > object.totalTime) then
+            TimeSpellConfig.spells[i].totalCd = 0;
+            TimeSpellConfig.spells[i].activeCd = 0;
+        end
+    end
+end
+
+function timeSpellConfigSave()
+    local configFile =  timeSpellFile;
+
+    local status, result = pcall(function() 
+        return json.encode(TimeSpellConfig, 2) 
+    end);
+
+    if not status then
+        return onError("Error saving configuration. Details: " .. result);
+    end
+      
+    if result:len() > 100 * 1024 * 1024 then
+        return onError("Configuration file over 100MB will not be saved.");
+    end
+
+    g_resources.writeFileContents(timeSpellFile, result);
+end
+
+ui.title:setOn(TimeSpellConfig.enabled);
+ui.title.onClick = function(widget)
+    TimeSpellConfig.enabled = not TimeSpellConfig.enabled;
+    widget:setOn(TimeSpellConfig.enabled);
+
+    timeSpellConfigSave();
+
+    if (not TimeSpellConfig.enabled) then
+        for i, widget in pairs(spellsWidgets) do
+            if (widget ~= nil) then
+                spellsWidgets[i]:destroy();
+                spellsWidgets[i] = nil;
+            end
+        end
+    end
+end
+ui.settings.onClick = function(widget)
+    windowUI:show();
+    windowUI:raise();
+    windowUI:focus();
+end
+windowUI.closeButton.onClick = function(widget)
+    windowUI:hide();
+    timeSpellConfigSave();
+end
+
+local destroySpellWidget = function(key)
+    spellsWidgets[key]:destroy();
+    spellsWidgets[key] = nil;
+end
+
+local refreshSpells = function()
+    if TimeSpellConfig.spells then
+      for i, child in pairs(MainPanel.spellList:getChildren()) do
+        child:destroy();
+      end
+      for _, entry in pairs(TimeSpellConfig.spells) do
+        local label = UI.createWidget('SpellEntry', MainPanel.spellList);
+        label.onDoubleClick = function(widget)
+            local spellTable = entry;
+            TimeSpellConfig.spells[entry.spell] = nil;
+            reindexTable(TimeSpellConfig.spells);
+            if (spellsWidgets[spellTable.spell] ~= nil) then
+                spellsWidgets[spellTable.spell]:destroy();
+                spellsWidgets[spellTable.spell] = nil;
+            end
+            MainPanel.spellName:setText(spellTable.spell);
+            MainPanel.onScreen:setText(spellTable.onScreen);
+            MainPanel.activeTime:setText(spellTable.activeTime);
+            MainPanel.totalTime:setText(spellTable.totalTime);
+            MainPanel.posX:setText(spellTable.x);
+            MainPanel.posY:setText(spellTable.y);
+            label:destroy();
+        end
+        label.enabled:setChecked(entry.enabled);
+        label.enabled.onClick = function(widget)
+          entry.enabled = not entry.enabled;
+          label.enabled:setChecked(entry.enabled);
+        end
+        label.remove.onClick = function(widget)
+          TimeSpellConfig.spells[entry.spell] = nil;
+          destroySpellWidget(entry.spell);
+          reindexTable(TimeSpellConfig.spells);
+          label:destroy();
+        end
+        label:setText('['.. entry.onScreen .. ']: Cooldown: ' .. entry.totalTime / 1000 .. 's');
+      end
+    end
+end
+
+refreshSpells();
+
+MainPanel.addSpell.onClick = function(widget)
+
+    local spellName = MainPanel.spellName:getText():trim():lower();
+    local onScreenName = MainPanel.onScreen:getText():trim();
+    local activeTime = tonumber(MainPanel.activeTime:getText()) or 0;
+    local totalTime = tonumber(MainPanel.totalTime:getText());
+    local posX = tonumber(MainPanel.posX:getText()) or 0;
+    local posY = tonumber(MainPanel.posY:getText()) or 39;
+
+    if (not totalTime) then
+        return warn('TimeSpell: Enter a valid cooldown.');
+    end
+
+    if (not posX) then
+        return warn('TimeSpell: Enter a valid Y position.');
+    end
+
+    if (not posY) then
+        return warn('TimeSpell: Enter a valid Y position.');
+    end
+
+    if (spellName:len() == 0) then
+        return warn('TimeSpell: Enter a valid spell.');
+    end
+
+    if (onScreenName:len() == 0) then
+        return warn('TimeSpell: Put a name on OnScreen.');
+    end
+
+    TimeSpellConfig.spells[spellName] = { 
+      index = #TimeSpellConfig.spells+1, 
+      spell = spellName, 
+      onScreen = onScreenName, 
+      activeTime = activeTime,
+      activeCd = 0,
+      totalTime = totalTime,
+      totalCd = 0,
+      x = posX,
+      y = posY,
+      enabled = true,
+    };
+
+    MainPanel.spellName:setText('');
+    MainPanel.onScreen:setText('');
+    MainPanel.activeTime:setText('');
+    MainPanel.totalTime:setText('');
+    MainPanel.posX:setText('');
+    MainPanel.posY:setText('');
+    refreshSpells();
+end
+
+local spellWidget = [[
+UIWidget
+  background-color: black
+  opacity: 0.8
+  padding: 0 5
+  focusable: true
+  phantom: false
+  draggable: true
+]];
+
+local function formatRemainingTime(time)
+    local remainingTime = (time - now) / 1000;
+    local timeText = '';
+    timeText = string.format("%.0f", (time - now) / 1000).. "s";
+    return timeText;
+end
+
+local function attachSpellWidgetCallbacks(key)
+    spellsWidgets[key].onDragEnter = function(widget, mousePos)
+        if not modules.corelib.g_keyboard.isCtrlPressed() then
+          return false
+        end
+        widget:breakAnchors()
+        widget.movingReference = { x = mousePos.x - widget:getX(), y = mousePos.y - widget:getY() }
+        return true
+    end
+  
+    spellsWidgets[key].onDragMove = function(widget, mousePos, moved)
+        local parentRect = widget:getParent():getRect()
+        local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+        local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())        
+        widget:move(x, y)
+        return true
+    end
+  
+    spellsWidgets[key].onDragLeave = function(widget, pos)
+      TimeSpellConfig.spells[key].x = widget:getX();
+      TimeSpellConfig.spells[key].y = widget:getY();
+      timeSpellConfigSave();
+      return true
+    end
+end
+
+local TimeSpellMacro = macro(100, function() 
+    if (not ui.title:isOn()) then return; end
+
+    for index, object in pairs(TimeSpellConfig.spells) do
+      if (not object.enabled and spellsWidgets[object.spell] ~= nil) then
+          spellsWidgets[object.spell]:destroy();
+          spellsWidgets[object.spell] = nil;
+      elseif (object.enabled) then
+          if (spellsWidgets[object.spell] == nil) then
+              spellsWidgets[object.spell] = setupUI(spellWidget, g_ui.getRootWidget());
+              spellsWidgets[object.spell]:setPosition({ x = object.x, y = object.y })
+              attachSpellWidgetCallbacks(object.spell);
+          end
+          
+          if (not object.totalCd or object.totalCd < now) then
+              spellsWidgets[object.spell]:setText(object.onScreen .. ': OK!');
+              spellsWidgets[object.spell]:setColor('green');
+          elseif (object.activeCd >= now) then
+              spellsWidgets[object.spell]:setColor('blue');
+              local timeText = formatRemainingTime(object.activeCd);
+              spellsWidgets[object.spell]:setText(object.onScreen .. ': ' .. timeText);
+          else
+              spellsWidgets[object.spell]:setColor('red');
+              local timeText = formatRemainingTime(object.totalCd);
+              spellsWidgets[object.spell]:setText(object.onScreen .. ': ' .. timeText);
+          end
+      end
+    end
+end);
+
+onTalk(function(name, level, mode, text, channelId, pos)
+    if (name ~= player:getName()) then return; end
+
+    text = text:lower();
+    if (TimeSpellConfig.spells[text] == nil) then return; end
+    if (TimeSpellConfig.spells[text].activeTime > 0) then
+        TimeSpellConfig.spells[text].activeCd = now + TimeSpellConfig.spells[text].activeTime;
+    end
+    TimeSpellConfig.spells[text].totalCd = now + TimeSpellConfig.spells[text].totalTime;
+    timeSpellConfigSave();
+end);
+
+macro(1, 'xSense', 'F12', function()
+    if storage.Sense then
+        locatePlayer = getPlayerByName(storage.Sense)
+        if not (locatePlayer and locatePlayer:getPosition().z == player:getPosition().z and getDistanceBetween(pos(), locatePlayer:getPosition()) <= 6) then
+            say('sense "' .. storage.Sense)
+            delay(1000)
+        end
+    end
+end, mainTab)
+
+
+onTalk(function(name, level, mode, text, channelId, pos)
+    if (player:getName() ~= name) then return; end
+    if string.sub(text, 1, 1):lower() == 'x' then
+        local checkMsg = string.sub(text, 2):trim()
+        if checkMsg == '0' then
+            storage.Sense = false;
+        else
+            storage.Sense = checkMsg;
+        end
+    end
+end)
+
+macro(1, 'Acertar Canudo', function()
+ if not g_game.isAttacking() then return end
+ local tt = g_game.getAttackingCreature()
+ local tx = tt:getPosition().x
+ local ty = tt:getPosition().y
+ local dir = player:getDirection()
+ local tdx = math.abs(tx-pos().x)
+ local tdy = math.abs(ty-pos().y)
+ if (tdy >= 2 and tdx >= 2) or tdx > 7 or tdy > 7 then return end 
+ if tdy >= tdx then
+  if ty > pos().y then
+   if dir ~= 2 then
+    return turn(2)
+   end
+  else
+   if dir ~= 0 then
+    return turn(0)
+   end
+  end
+ else
+  if tx > pos().x then
+   if dir ~= 1 then
+    return turn(1)
+   end
+  else
+   if dir ~= 3 then
+    return turn(3)
+   end
+  end
+ end
+end)
+local function checkPos(x, y)
+ xyz = g_game.getLocalPlayer():getPosition()
+ xyz.x = xyz.x + x
+ xyz.y = xyz.y + y
+ tile = g_map.getTile(xyz)
+ if tile then
+  return g_game.use(tile:getTopUseThing())  
+ else
+  return false
+ end
+end
+ 
+local bugMapMobile = {};
+
+local cursorWidget = g_ui.getRootWidget():recursiveGetChildById('pointer');
+
+local initialPos = { x = cursorWidget:getPosition().x / cursorWidget:getWidth(), y = cursorWidget:getPosition().y / cursorWidget:getHeight() };
+
+local availableKeys = {
+    ['Up'] = { 0, -6 },
+    ['Down'] = { 0, 6 },
+    ['Left'] = { -7, 0 },
+    ['Right'] = { 7, 0 }
+};
+
+function bugMapMobile.logic()
+    local pos = pos();
+    local keypadPos = { x = cursorWidget:getPosition().x / cursorWidget:getWidth(), y = cursorWidget:getPosition().y / cursorWidget:getHeight() };
+    local diffPos = { x = initialPos.x - keypadPos.x, y = initialPos.y - keypadPos.y };
+
+    if (diffPos.y < 0.46 and diffPos.y > -0.46) then
+        if (diffPos.x > 0) then
+            pos.x = pos.x + availableKeys['Left'][1];
+        elseif (diffPos.x < 0) then
+            pos.x = pos.x + availableKeys['Right'][1];
+        else return end
+    elseif (diffPos.x < 0.46 and diffPos.x > -0.46) then
+        if (diffPos.y > 0) then
+            pos.y = pos.y + availableKeys['Up'][2];
+        elseif (diffPos.y < 0) then
+            pos.y = pos.y + availableKeys['Down'][2];
+        else return; end
+    end
+    local tile = g_map.getTile(pos);
+    if (not tile) then return; end
+
+    g_game.use(tile:getTopUseThing());
+end
+
+bugMapMobile.macro = macro(1, "Bug Map", bugMapMobile.logic)
+meuIcone = addIcon("Attack Target", {item=15849, text="Attack Follow", hotkey=""},macro(250, "Attack Follow",  function()
+   if g_game.isOnline() and g_game.isAttacking() then
+         g_game.setChaseMode(1)
+           end
+           end) )
+
+meuIcone:breakAnchors();
+meuIcone:move(70,50);
+
+ds= macro(100, "Atacar a uno", nil, function()
+  if g_game.isAttacking() 
+then
+ oldTarget = g_game.getAttackingCreature()
+  end
+  if (oldTarget and oldTarget:getPosition()) 
+then
+ if (not g_game.isAttacking() and getDistanceBetween(pos(), oldTarget:getPosition()) <= 8) then
+    
+if (oldTarget:getPosition().z == posz()) then
+        g_game.attack(oldTarget)
+      end
+    end
+  end
+end)
+test1 = addIcon("6", {item =2137, text = "H.T", hotkey = ""}, ds)
+test1:breakAnchors()
+test1:move(200, 350)
+
+lblInfo= UI.Label("-- [[Utiles]] --")
+lblInfo:setColor("yellow")
+macro(1, 'Acertar Canudo', function()
+ if not g_game.isAttacking() then return end
+ local tt = g_game.getAttackingCreature()
+ local tx = tt:getPosition().x
+ local ty = tt:getPosition().y
+ local dir = player:getDirection()
+ local tdx = math.abs(tx-pos().x)
+ local tdy = math.abs(ty-pos().y)
+ if (tdy >= 2 and tdx >= 2) or tdx > 7 or tdy > 7 then return end 
+ if tdy >= tdx then
+  if ty > pos().y then
+   if dir ~= 2 then
+    return turn(2)
+   end
+  else
+   if dir ~= 0 then
+    return turn(0)
+   end
+  end
+ else
+  if tx > pos().x then
+   if dir ~= 1 then
+    return turn(1)
+   end
+  else
+   if dir ~= 3 then
+    return turn(3)
+   end
+  end
+ end
+end)
+local function checkPos(x, y)
+ xyz = g_game.getLocalPlayer():getPosition()
+ xyz.x = xyz.x + x
+ xyz.y = xyz.y + y
+ tile = g_map.getTile(xyz)
+ if tile then
+  return g_game.use(tile:getTopUseThing())  
+ else
+  return false
+ end
+end 
+
+local dropItems = { 3035 }
+local maxStackedItems = 10
+local dropDelay = 100
+
+gpAntiPushDrop = macro(dropDelay , "anti push", function ()
+  antiPush()
+end)
+
+onPlayerPositionChange(function()
+    antiPush()
+end)
+
+function antiPush()
+  if gpAntiPushDrop:isOff() then
+    return
+  end
+
+  local tile = g_map.getTile(pos())
+  if tile and tile:getThingCount() < maxStackedItems then
+    local thing = tile:getTopThing()
+    if thing and not thing:isNotMoveable() then
+      for i, item in pairs(dropItems) do
+        if item ~= thing:getId() then
+            local dropItem = findItem(item)
+            if dropItem then
+              g_game.move(dropItem, pos(), 1)
+            end
+        end
+      end
+    end
+  end
+end
+
+
+
+macro(1, "Atacar Corriendo", "", function() 
+  local battlelist = getSpectators();
+  local closest = 10
+  local lowesthpc = 101
+  for key, val in pairs(battlelist) do
+    if val:isMonster() then
+      if getDistanceBetween(player:getPosition(), val:getPosition()) <= closest then
+        closest = getDistanceBetween(player:getPosition(), val:getPosition())
+        if val:getHealthPercent() < lowesthpc then
+          lowesthpc = val:getHealthPercent()
+        end
+      end
+    end
+  end
+  for key, val in pairs(battlelist) do
+    if val:isMonster() then
+      if getDistanceBetween(player:getPosition(), val:getPosition()) <= closest then
+        if g_game.getAttackingCreature() ~= val and val:getHealthPercent() <= lowesthpc then 
+          g_game.attack(val)
+     delay(100)
+          break
+        end
+      end
+    end
+  end
+end)
+
+
+
+md = macro(100, "PowerDown", function()
+if (manapercent() >= 100) then 
+say('PowerDown')
+end
+end)
+test1 = addIcon("7", {item =2137, text = "M.D", hotkey = ""}, md)
+test1:breakAnchors()
+test1:move(200, 400)
+--[[Esconder Magias Laranjas da tela]]--
+TH = macro(100, "Esconder msj Naranja", function() end)
+onStaticText(function(thing, text)
+    if TH.isOff() then return end
+    if not text:find('says:') then
+        g_map.cleanTexts()
+    end
+end)
+
+
+--[[esconder MAGIAS(SPRITES)]]--
+sprh = macro(100, "Esconder Sprite", function() end)
+onAddThing(function(tile, thing)
+    if sprh.isOff() then return end
+    if thing:isEffect() then
+        thing:hide()
+    end
+end)
+
+macro(500, "Auto Haste", nil, function()
+    if not hasHaste() and storage.autoHasteText:len() > 0 then
+      if saySpell(storage.autoHasteText) then
+        delay(5000)
+      end
+    end
+  end)
+  addTextEdit("autoHasteText", storage.autoHasteText or "utani gran hur", function(widget, text) 
+    storage.autoHasteText = text
+end)
+
+
+
+
+setDefaultTab("HP")
+
+lblInfo= UI.Label("-- [[Recuperar HP]] --")
+lblInfo:setColor("yellow")
+macro(100, "Regeneration", function()
+  if hppercent() <= 99 then
+   say('Regeneration')
+  end
+end)
+
+macro(100, "Big Regeneration", function()
+  if hppercent() <= 99 then
+   say('Big Regeneration')
+  end
+end)
+
+macro(100, "Hibrido Regen", function()
+  if hppercent() <= 99 then
+   say('Hibrido Regeneration')
+  end
+end)
+
+macro(100, "Fire Regen", function()
+  if hppercent() <= 99 then
+   say('Fire Regeneration')
+  end
+end)
+
+macro(100, "Magnus Regen", function()
+  if hppercent() <= 99 then
+   say('Magnus Regeneration')
+  end
+end)
+
+lblInfo= UI.Label("-- [[Senzu]] --")
+lblInfo:setColor("yellow")
+macro(1, 'EXODIA PORTION [RARE]s', function()
+  if hppercent() <= 90 or manapercent() <= 90 then
+   usewith(13233, player)
+   end
+end)
+
+
+macro(1, 'TENEBRA SENZU', function()
+  if hppercent() <= 90 or manapercent() <= 90 then
+   usewith(13320, player)
+   end
+end)
+
+sb = macro(1, 'RAYMOND STRIKER', function()
+  if hppercent() <= 98 or manapercent() <= 98 then
+   usewith(6105, player)
+   end
+end)
+test1 = addIcon("4", {item =2137, text = "Blue", hotkey = "ctrl+space"}, sb)
+test1:breakAnchors()
+test1:move(1500, 500)
+
+
+if type(storage.hpitem1) ~= "table" then
+  storage.hpitem1 = {on=false, title="HP%", item=11862, min=51, max=90}
+end
+if type(storage.hpitem2) ~= "table" then
+  storage.hpitem2 = {on=false, title="HP%", item=11858, min=0, max=50}
+end
+if type(storage.manaitem1) ~= "table" then
+  storage.manaitem1 = {on=false, title="MP%", item=11862, min=51, max=90}
+end
+if type(storage.manaitem2) ~= "table" then
+  storage.manaitem2 = {on=false, title="MP%", item=11859, min=0, max=50}
+end
+
+for i, healingInfo in ipairs({storage.hpitem1, storage.hpitem2, storage.manaitem1, storage.manaitem2}) do
+  local healingmacro = macro(20, function()
+    local hp = i <= 2 and player:getHealthPercent() or math.min(100, math.floor(100 * (player:getMana() / player:getMaxMana())))
+    if healingInfo.max >= hp and hp >= healingInfo.min then
+      if TargetBot then 
+        TargetBot.useItem(healingInfo.item, healingInfo.subType, player) -- sync spell with targetbot if available
+      else
+        local thing = g_things.getThingType(healingInfo.item)
+        local subType = g_game.getClientVersion() >= 860 and 0 or 1
+        if thing and thing:isFluidContainer() then
+          subType = healingInfo.subType
+        end
+        g_game.useInventoryItemWith(healingInfo.item, player, subType)
+      end
+    end
+  end)
+  healingmacro.setOn(healingInfo.on)
+
+  UI.DualScrollItemPanel(healingInfo, function(widget, newParams) 
+    healingInfo = newParams
+    healingmacro.setOn(healingInfo.on and healingInfo.item > 100)
+  end)
+end
+UI.Separator()
+
+UI.Label("Food:")
+if type(storage.foodItems) ~= "table" then
+  storage.foodItems = {3577, 3582}
+end
+
+local foodContainer = UI.Container(function(widget, items)
+  storage.foodItems = items
+end, true)
+foodContainer:setHeight(35)
+foodContainer:setItems(storage.foodItems)
+
+macro(10000, "eat food", function()
+  if not storage.foodItems[1] then return end
+  -- search for food in containers
+  for _, container in pairs(g_game.getContainers()) do
+    for __, item in ipairs(container:getItems()) do
+      for i, foodItem in ipairs(storage.foodItems) do
+        if item:getId() == foodItem.id then
+          return g_game.use(item)
+        end
+      end
+    end
+  end
+  -- can't find any food, try to eat random item using hotkey
+  if g_game.getClientVersion() < 780 then return end -- hotkey's dont work on old tibia
+  local toEat = storage.foodItems[math.random(1, #storage.foodItems)]
+  if toEat then g_game.useInventoryItem(toEat.id) end
+end)
+
+onKeyPress(function(key)
+    if key == 'F1' then 
+        if not getFinger() then
+            moveToSlot(12507, SlotFinger)
+        else
+            moveToSlot(getFinger(), getBack())
+        end
+    end
+    if key == 'F2' then
+        if not getNeck() then
+            moveToSlot(12506, SlotNeck)
+        else
+            moveToSlot(getNeck(), getBack())
+        end
+    end
+end);("Error loading file (" .. timeSpellFile .. "). To fix the problem, delete TimeSpell.json. Details:" .. result)
+    end
+    TimeSpellConfig = result
+    if (type(TimeSpellConfig.spells) ~= 'table') then
+        TimeSpellConfig.spells = {};
+    end
+
+    for i, object in pairs(TimeSpellConfig.spells) do
+        if (object.totalCd - now > object.totalTime) then
+            TimeSpellConfig.spells[i].totalCd = 0;
+            TimeSpellConfig.spells[i].activeCd = 0;
+        end
+    end
+end
+
+function timeSpellConfigSave()
+    local configFile =  timeSpellFile;
+
+    local status, result = pcall(function() 
+        return json.encode(TimeSpellConfig, 2) 
+    end);
+
+    if not status then
+        return onError("Error saving configuration. Details: " .. result);
+    end
+      
+    if result:len() > 100 * 1024 * 1024 then
+        return onError("Configuration file over 100MB will not be saved.");
+    end
+
+    g_resources.writeFileContents(timeSpellFile, result);
+end
+
+ui.title:setOn(TimeSpellConfig.enabled);
+ui.title.onClick = function(widget)
+    TimeSpellConfig.enabled = not TimeSpellConfig.enabled;
+    widget:setOn(TimeSpellConfig.enabled);
+
+    timeSpellConfigSave();
+
+    if (not TimeSpellConfig.enabled) then
+        for i, widget in pairs(spellsWidgets) do
+            if (widget ~= nil) then
+                spellsWidgets[i]:destroy();
+                spellsWidgets[i] = nil;
+            end
+        end
+    end
+end
+ui.settings.onClick = function(widget)
+    windowUI:show();
+    windowUI:raise();
+    windowUI:focus();
+end
+windowUI.closeButton.onClick = function(widget)
+    windowUI:hide();
+    timeSpellConfigSave();
+end
+
+local destroySpellWidget = function(key)
+    spellsWidgets[key]:destroy();
+    spellsWidgets[key] = nil;
+end
+
+local refreshSpells = function()
+    if TimeSpellConfig.spells then
+      for i, child in pairs(MainPanel.spellList:getChildren()) do
+        child:destroy();
+      end
+      for _, entry in pairs(TimeSpellConfig.spells) do
+        local label = UI.createWidget('SpellEntry', MainPanel.spellList);
+        label.onDoubleClick = function(widget)
+            local spellTable = entry;
+            TimeSpellConfig.spells[entry.spell] = nil;
+            reindexTable(TimeSpellConfig.spells);
+            if (spellsWidgets[spellTable.spell] ~= nil) then
+                spellsWidgets[spellTable.spell]:destroy();
+                spellsWidgets[spellTable.spell] = nil;
+            end
+            MainPanel.spellName:setText(spellTable.spell);
+            MainPanel.onScreen:setText(spellTable.onScreen);
+            MainPanel.activeTime:setText(spellTable.activeTime);
+            MainPanel.totalTime:setText(spellTable.totalTime);
+            MainPanel.posX:setText(spellTable.x);
+            MainPanel.posY:setText(spellTable.y);
+            label:destroy();
+        end
+        label.enabled:setChecked(entry.enabled);
+        label.enabled.onClick = function(widget)
+          entry.enabled = not entry.enabled;
+          label.enabled:setChecked(entry.enabled);
+        end
+        label.remove.onClick = function(widget)
+          TimeSpellConfig.spells[entry.spell] = nil;
+          destroySpellWidget(entry.spell);
+          reindexTable(TimeSpellConfig.spells);
+          label:destroy();
+        end
+        label:setText('['.. entry.onScreen .. ']: Cooldown: ' .. entry.totalTime / 1000 .. 's');
+      end
+    end
+end
+
+refreshSpells();
+
+MainPanel.addSpell.onClick = function(widget)
+
+    local spellName = MainPanel.spellName:getText():trim():lower();
+    local onScreenName = MainPanel.onScreen:getText():trim();
+    local activeTime = tonumber(MainPanel.activeTime:getText()) or 0;
+    local totalTime = tonumber(MainPanel.totalTime:getText());
+    local posX = tonumber(MainPanel.posX:getText()) or 0;
+    local posY = tonumber(MainPanel.posY:getText()) or 39;
+
+    if (not totalTime) then
+        return warn('TimeSpell: Enter a valid cooldown.');
+    end
+
+    if (not posX) then
+        return warn('TimeSpell: Enter a valid Y position.');
+    end
+
+    if (not posY) then
+        return warn('TimeSpell: Enter a valid Y position.');
+    end
+
+    if (spellName:len() == 0) then
+        return warn('TimeSpell: Enter a valid spell.');
+    end
+
+    if (onScreenName:len() == 0) then
+        return warn('TimeSpell: Put a name on OnScreen.');
+    end
+
+    TimeSpellConfig.spells[spellName] = { 
+      index = #TimeSpellConfig.spells+1, 
+      spell = spellName, 
+      onScreen = onScreenName, 
+      activeTime = activeTime,
+      activeCd = 0,
+      totalTime = totalTime,
+      totalCd = 0,
+      x = posX,
+      y = posY,
+      enabled = true,
+    };
+
+    MainPanel.spellName:setText('');
+    MainPanel.onScreen:setText('');
+    MainPanel.activeTime:setText('');
+    MainPanel.totalTime:setText('');
+    MainPanel.posX:setText('');
+    MainPanel.posY:setText('');
+    refreshSpells();
+end
+
+local spellWidget = [[
+UIWidget
+  background-color: black
+  opacity: 0.8
+  padding: 0 5
+  focusable: true
+  phantom: false
+  draggable: true
+]];
+
+local function formatRemainingTime(time)
+    local remainingTime = (time - now) / 1000;
+    local timeText = '';
+    timeText = string.format("%.0f", (time - now) / 1000).. "s";
+    return timeText;
+end
+
+local function attachSpellWidgetCallbacks(key)
+    spellsWidgets[key].onDragEnter = function(widget, mousePos)
+        if not modules.corelib.g_keyboard.isCtrlPressed() then
+          return false
+        end
+        widget:breakAnchors()
+        widget.movingReference = { x = mousePos.x - widget:getX(), y = mousePos.y - widget:getY() }
+        return true
+    end
+  
+    spellsWidgets[key].onDragMove = function(widget, mousePos, moved)
+        local parentRect = widget:getParent():getRect()
+        local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+        local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())        
+        widget:move(x, y)
+        return true
+    end
+  
+    spellsWidgets[key].onDragLeave = function(widget, pos)
+      TimeSpellConfig.spells[key].x = widget:getX();
+      TimeSpellConfig.spells[key].y = widget:getY();
+      timeSpellConfigSave();
+      return true
+    end
+end
+
+local TimeSpellMacro = macro(100, function() 
+    if (not ui.title:isOn()) then return; end
+
+    for index, object in pairs(TimeSpellConfig.spells) do
+      if (not object.enabled and spellsWidgets[object.spell] ~= nil) then
+          spellsWidgets[object.spell]:destroy();
+          spellsWidgets[object.spell] = nil;
+      elseif (object.enabled) then
+          if (spellsWidgets[object.spell] == nil) then
+              spellsWidgets[object.spell] = setupUI(spellWidget, g_ui.getRootWidget());
+              spellsWidgets[object.spell]:setPosition({ x = object.x, y = object.y })
+              attachSpellWidgetCallbacks(object.spell);
+          end
+          
+          if (not object.totalCd or object.totalCd < now) then
+              spellsWidgets[object.spell]:setText(object.onScreen .. ': OK!');
+              spellsWidgets[object.spell]:setColor('green');
+          elseif (object.activeCd >= now) then
+              spellsWidgets[object.spell]:setColor('blue');
+              local timeText = formatRemainingTime(object.activeCd);
+              spellsWidgets[object.spell]:setText(object.onScreen .. ': ' .. timeText);
+          else
+              spellsWidgets[object.spell]:setColor('red');
+              local timeText = formatRemainingTime(object.totalCd);
+              spellsWidgets[object.spell]:setText(object.onScreen .. ': ' .. timeText);
+          end
+      end
+    end
+end);
+
+onTalk(function(name, level, mode, text, channelId, pos)
+    if (name ~= player:getName()) then return; end
+
+    text = text:lower();
+    if (TimeSpellConfig.spells[text] == nil) then return; end
+    if (TimeSpellConfig.spells[text].activeTime > 0) then
+        TimeSpellConfig.spells[text].activeCd = now + TimeSpellConfig.spells[text].activeTime;
+    end
+    TimeSpellConfig.spells[text].totalCd = now + TimeSpellConfig.spells[text].totalTime;
+    timeSpellConfigSave();
+end);
+
+macro(1, 'xSense', 'F12', function()
+    if storage.Sense then
+        locatePlayer = getPlayerByName(storage.Sense)
+        if not (locatePlayer and locatePlayer:getPosition().z == player:getPosition().z and getDistanceBetween(pos(), locatePlayer:getPosition()) <= 6) then
+            say('sense "' .. storage.Sense)
+            delay(1000)
+        end
+    end
+end, mainTab)
+
+
+onTalk(function(name, level, mode, text, channelId, pos)
+    if (player:getName() ~= name) then return; end
+    if string.sub(text, 1, 1):lower() == 'x' then
+        local checkMsg = string.sub(text, 2):trim()
+        if checkMsg == '0' then
+            storage.Sense = false;
+        else
+            storage.Sense = checkMsg;
+        end
+    end
+end)
+
+macro(1, 'Acertar Canudo', function()
+ if not g_game.isAttacking() then return end
+ local tt = g_game.getAttackingCreature()
+ local tx = tt:getPosition().x
+ local ty = tt:getPosition().y
+ local dir = player:getDirection()
+ local tdx = math.abs(tx-pos().x)
+ local tdy = math.abs(ty-pos().y)
+ if (tdy >= 2 and tdx >= 2) or tdx > 7 or tdy > 7 then return end 
+ if tdy >= tdx then
+  if ty > pos().y then
+   if dir ~= 2 then
+    return turn(2)
+   end
+  else
+   if dir ~= 0 then
+    return turn(0)
+   end
+  end
+ else
+  if tx > pos().x then
+   if dir ~= 1 then
+    return turn(1)
+   end
+  else
+   if dir ~= 3 then
+    return turn(3)
+   end
+  end
+ end
+end)
+local function checkPos(x, y)
+ xyz = g_game.getLocalPlayer():getPosition()
+ xyz.x = xyz.x + x
+ xyz.y = xyz.y + y
+ tile = g_map.getTile(xyz)
+ if tile then
+  return g_game.use(tile:getTopUseThing())  
+ else
+  return false
+ end
+end 
+bugmap = macro(1, 'Bug Map F9', '', function() 
+ if modules.corelib.g_keyboard.isKeyPressed('w') then
+  checkPos(0, -5)
+ elseif modules.corelib.g_keyboard.isKeyPressed('e') then
+  checkPos(3, -3)
+ elseif modules.corelib.g_keyboard.isKeyPressed('d') then
+  checkPos(5, 0)
+ elseif modules.corelib.g_keyboard.isKeyPressed('c') then
+  checkPos(3, 3)
+ elseif modules.corelib.g_keyboard.isKeyPressed('s') then
+  checkPos(0, 5)
+ elseif modules.corelib.g_keyboard.isKeyPressed('z') then
+  checkPos(-3, 3)
+ elseif modules.corelib.g_keyboard.isKeyPressed('a') then
+  checkPos(-5, 0)
+ elseif modules.corelib.g_keyboard.isKeyPressed('q') then
+  checkPos(-3, -3)
+ end
+end)
+test1 = addIcon("5", {item =2137, text = "Bug Map", hotkey = "F9"}, bugmap)
+test1:breakAnchors()
+test1:move(1500, 600)
+
+ds= macro(100, "Hold Target", nil, function()
+  if g_game.isAttacking() 
+then
+ oldTarget = g_game.getAttackingCreature()
+  end
+  if (oldTarget and oldTarget:getPosition()) 
+then
+ if (not g_game.isAttacking() and getDistanceBetween(pos(), oldTarget:getPosition()) <= 8) then
+    
+if (oldTarget:getPosition().z == posz()) then
+        g_game.attack(oldTarget)
+      end
+    end
+  end
+end)
+test1 = addIcon("6", {item =2137, text = "H.T", hotkey = ""}, ds)
+test1:breakAnchors()
+test1:move(200, 350)
+
+lblInfo= UI.Label("-- [[Utiles]] --")
+macro(1, 'Acertar Canudo', function()
+ if not g_game.isAttacking() then return end
+ local tt = g_game.getAttackingCreature()
+ local tx = tt:getPosition().x
+ local ty = tt:getPosition().y
+ local dir = player:getDirection()
+ local tdx = math.abs(tx-pos().x)
+ local tdy = math.abs(ty-pos().y)
+ if (tdy >= 2 and tdx >= 2) or tdx > 7 or tdy > 7 then return end 
+ if tdy >= tdx then
+  if ty > pos().y then
+   if dir ~= 2 then
+    return turn(2)
+   end
+  else
+   if dir ~= 0 then
+    return turn(0)
+   end
+  end
+ else
+  if tx > pos().x then
+   if dir ~= 1 then
+    return turn(1)
+   end
+  else
+   if dir ~= 3 then
+    return turn(3)
+   end
+  end
+ end
+end)
+local function checkPos(x, y)
+ xyz = g_game.getLocalPlayer():getPosition()
+ xyz.x = xyz.x + x
+ xyz.y = xyz.y + y
+ tile = g_map.getTile(xyz)
+ if tile then
+  return g_game.use(tile:getTopUseThing())  
+ else
+  return false
+ end
+end 
+
+local dropItems = { 3035 }
+local maxStackedItems = 10
+local dropDelay = 100
+
+gpAntiPushDrop = macro(dropDelay , "anti push", function ()
+  antiPush()
+end)
+
+onPlayerPositionChange(function()
+    antiPush()
+end)
+
+function antiPush()
+  if gpAntiPushDrop:isOff() then
+    return
+  end
+
+  local tile = g_map.getTile(pos())
+  if tile and tile:getThingCount() < maxStackedItems then
+    local thing = tile:getTopThing()
+    if thing and not thing:isNotMoveable() then
+      for i, item in pairs(dropItems) do
+        if item ~= thing:getId() then
+            local dropItem = findItem(item)
+            if dropItem then
+              g_game.move(dropItem, pos(), 1)
+            end
+        end
+      end
+    end
+  end
+end
+
+
+
+macro(1, "Atk Mob Tela", "", function() 
+  local battlelist = getSpectators();
+  local closest = 10
+  local lowesthpc = 101
+  for key, val in pairs(battlelist) do
+    if val:isMonster() then
+      if getDistanceBetween(player:getPosition(), val:getPosition()) <= closest then
+        closest = getDistanceBetween(player:getPosition(), val:getPosition())
+        if val:getHealthPercent() < lowesthpc then
+          lowesthpc = val:getHealthPercent()
+        end
+      end
+    end
+  end
+  for key, val in pairs(battlelist) do
+    if val:isMonster() then
+      if getDistanceBetween(player:getPosition(), val:getPosition()) <= closest then
+        if g_game.getAttackingCreature() ~= val and val:getHealthPercent() <= lowesthpc then 
+          g_game.attack(val)
+     delay(100)
+          break
+        end
+      end
+    end
+  end
+end)
+
+
+
+md = macro(100, "PowerDown", function()
+if (manapercent() >= 100) then 
+say('PowerDown')
+end
+end)
+test1 = addIcon("7", {item =2137, text = "M.D", hotkey = ""}, md)
+test1:breakAnchors()
+test1:move(200, 400)
+--[[Esconder Magias Laranjas da tela]]--
+TH = macro(100, "esconder msg laranja", function() end)
+onStaticText(function(thing, text)
+    if TH.isOff() then return end
+    if not text:find('says:') then
+        g_map.cleanTexts()
+    end
+end)
+
+
+--[[esconder MAGIAS(SPRITES)]]--
+sprh = macro(100, "esconder sprite", function() end)
+onAddThing(function(tile, thing)
+    if sprh.isOff() then return end
+    if thing:isEffect() then
+        thing:hide()
+    end
+end)
+
+macro(500, "Auto Haste", nil, function()
+    if not hasHaste() and storage.autoHasteText:len() > 0 then
+      if saySpell(storage.autoHasteText) then
+        delay(5000)
+      end
+    end
+  end)
+  addTextEdit("autoHasteText", storage.autoHasteText or "utani gran hur", function(widget, text) 
+    storage.autoHasteText = text
+end)
+
+
+
+
+setDefaultTab("HP")
+
+lblInfo:setColor("green")
+macro(100, "Regeneration", function()
+  if hppercent() <= 99 then
+   say('Regeneration')
+  end
+end)
+
+
+macro(100, "Big Regeneration", function()
+  if hppercent() <= 99 then
+   say('Big Regeneration')
+  end
+end)
+
+macro(100, "Hibrido Regen", function()
+  if hppercent() <= 99 then
+   say('Hibrido Regeneration')
+  end
+end)
+
+lblInfo= UI.Label("-- [[Senzu]] --")
+macro(1, 'EXODIA PORTION [RARE]s', function()
+  if hppercent() <= 90 or manapercent() <= 90 then
+   usewith(13233, player)
+   end
+end)
+
+
+macro(1, 'TENEBRA SENZU', function()
+  if hppercent() <= 90 or manapercent() <= 90 then
+   usewith(13320, player)
+   end
+end)
+
+sb = macro(1, 'RAYMOND STRIKER', function()
+  if hppercent() <= 98 or manapercent() <= 98 then
+   usewith(6105, player)
+   end
+end)
+test1 = addIcon("4", {item =2137, text = "Blue", hotkey = "ctrl+space"}, sb)
+test1:breakAnchors()
+test1:move(1500, 500)
+
+
+if type(storage.hpitem1) ~= "table" then
+  storage.hpitem1 = {on=false, title="HP%", item=11862, min=51, max=90}
+end
+if type(storage.hpitem2) ~= "table" then
+  storage.hpitem2 = {on=false, title="HP%", item=11858, min=0, max=50}
+end
+if type(storage.manaitem1) ~= "table" then
+  storage.manaitem1 = {on=false, title="MP%", item=11862, min=51, max=90}
+end
+if type(storage.manaitem2) ~= "table" then
+  storage.manaitem2 = {on=false, title="MP%", item=11859, min=0, max=50}
+end
+
+for i, healingInfo in ipairs({storage.hpitem1, storage.hpitem2, storage.manaitem1, storage.manaitem2}) do
+  local healingmacro = macro(20, function()
+    local hp = i <= 2 and player:getHealthPercent() or math.min(100, math.floor(100 * (player:getMana() / player:getMaxMana())))
+    if healingInfo.max >= hp and hp >= healingInfo.min then
+      if TargetBot then 
+        TargetBot.useItem(healingInfo.item, healingInfo.subType, player) -- sync spell with targetbot if available
+      else
+        local thing = g_things.getThingType(healingInfo.item)
+        local subType = g_game.getClientVersion() >= 860 and 0 or 1
+        if thing and thing:isFluidContainer() then
+          subType = healingInfo.subType
+        end
+        g_game.useInventoryItemWith(healingInfo.item, player, subType)
+      end
+    end
+  end)
+  healingmacro.setOn(healingInfo.on)
+
+  UI.DualScrollItemPanel(healingInfo, function(widget, newParams) 
+    healingInfo = newParams
+    healingmacro.setOn(healingInfo.on and healingInfo.item > 100)
+  end)
+end
+UI.Separator()
+
+UI.Label("Food:")
+if type(storage.foodItems) ~= "table" then
+  storage.foodItems = {3577, 3582}
+end
+
+local foodContainer = UI.Container(function(widget, items)
+  storage.foodItems = items
+end, true)
+foodContainer:setHeight(35)
+foodContainer:setItems(storage.foodItems)
+
+macro(10000, "eat food", function()
+  if not storage.foodItems[1] then return end
+  -- search for food in containers
+  for _, container in pairs(g_game.getContainers()) do
+    for __, item in ipairs(container:getItems()) do
+      for i, foodItem in ipairs(storage.foodItems) do
+        if item:getId() == foodItem.id then
+          return g_game.use(item)
+        end
+      end
+    end
+  end
+  -- can't find any food, try to eat random item using hotkey
+  if g_game.getClientVersion() < 780 then return end -- hotkey's dont work on old tibia
+  local toEat = storage.foodItems[math.random(1, #storage.foodItems)]
+  if toEat then g_game.useInventoryItem(toEat.id) end
+end)
+
+onKeyPress(function(key)
+    if key == 'F1' then 
+        if not getFinger() then
+            moveToSlot(12507, SlotFinger)
+        else
+            moveToSlot(getFinger(), getBack())
+        end
+    end
+    if key == 'F2' then
+        if not getNeck() then
+            moveToSlot(12506, SlotNeck)
+        else
+            moveToSlot(getNeck(), getBack())
+        end
+    end
+end);
