@@ -1,0 +1,272 @@
+setDefaultTab("Tools")
+
+local editNameUI = setupUI([[
+Panel
+  height: 80
+
+  Label
+    id: customScriptLabel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 3
+    height: 18
+    text: AutoLoot: 
+
+  Button
+    id: myLootShowButton
+    anchors.top: customScriptLabel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 3
+    height: 18
+    text: "Lista De Loot"
+
+  Button
+    id: editNameButton
+    anchors.top: myLootShowButton.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 3
+    margin-top: 5
+    height: 18
+    text: Agregar Loot
+
+  Button
+    id: removeNameButton
+    anchors.top: editNameButton.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 3
+    margin-top: 5
+    height: 18
+    text: Remover Loot
+]], parent)
+
+g_ui.loadUIFromString([[
+EditNameWindow < MainWindow
+  text: Autoloot
+  size: 160 170
+
+  TextEdit
+    id: inputField
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 20
+    margin-left: 10
+    margin-right: 10
+    height: 25
+
+  Button
+    id: sendButton
+    text: Agregar
+    anchors.top: inputField.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    margin-left: 10
+    margin-right: 10
+    height: 22
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 6
+
+  Button
+    id: closeButton
+    text: Close
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+
+  Button
+    id: scriptButton
+    text: + Scripts
+    font: cipsoftFont
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    size: 60 21
+]])
+
+local panelName = "editName"
+if not storage[panelName] then
+  storage[panelName] = {
+    enabled = false,
+  }
+end
+
+local config = storage[panelName]
+
+rootWidget = g_ui.getRootWidget()
+if rootWidget then
+  editNameWindow = UI.createWindow('EditNameWindow', rootWidget)
+  editNameWindow:hide()
+
+  editNameUI.editNameButton.onClick = function(widget)
+    editNameWindow:show()
+    editNameWindow:raise()
+    editNameWindow:focus()
+  end
+
+  editNameWindow.closeButton.onClick = function(widget)
+    editNameWindow:hide()
+  end
+
+  editNameWindow.sendButton.onClick = function(widget)
+    local inputText = editNameWindow.inputField:getText()
+    if inputText and inputText:trim() ~= "" then
+      g_game.talk("!myloot add, " .. inputText)
+      editNameWindow:hide()  -- Cierra la ventana después de agregar
+    end
+  end
+
+  editNameWindow.scriptButton.onClick = function(widget)
+    g_platform.openUrl("https://discord.com/invite/RF54ugxJ5N")
+  end
+end
+
+-- Ventana para "!myloot remove"
+g_ui.loadUIFromString([[
+RemoveNameWindow < MainWindow
+  text: Autoloot.
+  size: 160 170
+
+  TextEdit
+    id: inputField
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 20
+    margin-left: 10
+    margin-right: 10
+    height: 25
+
+  Button
+    id: sendButton
+    text: Remover
+    anchors.top: inputField.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    margin-left: 10
+    margin-right: 10
+    height: 22
+
+  HorizontalSeparator
+    id: separator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: closeButton.top
+    margin-bottom: 6
+
+  Button
+    id: closeButton
+    text: Close
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+
+  Button
+    id: scriptButton
+    text: + Scripts
+    font: cipsoftFont
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    size: 60 21
+]])
+
+if rootWidget then
+  removeNameWindow = UI.createWindow('RemoveNameWindow', rootWidget)
+  removeNameWindow:hide()
+
+  editNameUI.removeNameButton.onClick = function(widget)
+    removeNameWindow:show()
+    removeNameWindow:raise()
+    removeNameWindow:focus()
+  end
+
+  removeNameWindow.closeButton.onClick = function(widget)
+    removeNameWindow:hide()
+  end
+
+  removeNameWindow.sendButton.onClick = function(widget)
+    local inputText = removeNameWindow.inputField:getText()
+    if inputText and inputText:trim() ~= "" then
+      g_game.talk("!myloot remove, " .. inputText)
+      removeNameWindow:hide()  -- Cierra la ventana después de remover
+    end
+  end
+
+  removeNameWindow.scriptButton.onClick = function(widget)
+    g_platform.openUrl("https://discord.com/invite/RF54ugxJ5N")
+  end
+end
+
+-- Configurar el botón "!myloot show"
+editNameUI.myLootShowButton.onClick = function()
+  g_game.talk("!myloot show")
+end
+
+
+
+
+UI.Label("Comandos:")
+
+local uiCommands = setupUI([[
+Panel
+  height: 50
+
+  Button
+    id: reward
+    !text: tr('reward')
+    font: cipsoftFont
+    size: 52 20
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 5
+    margin-left: 5
+
+  Button
+    id: tools
+    !text: tr('tools')
+    font: cipsoftFont
+    size: 52 20
+    anchors.top: reward.top
+    anchors.left: reward.right
+    margin-left: 5
+
+  Button
+    id: aol
+    !text: tr('aol')
+    font: cipsoftFont
+    size: 52 20
+    anchors.top: reward.top
+    anchors.left: tools.right
+    margin-left: 5
+
+  Button
+    id: commands
+    !text: tr('Otros')
+    font: cipsoftFont
+    size: 52 20
+    anchors.top: prev.bottom
+    margin-top: 5
+    margin-left: 5
+    anchors.left: parent.left
+]])
+uiCommands:setId("MadGeniushere")
+
+-- Handle UI element clicks
+uiCommands.reward.onClick = function(widget) say("!reward") end
+uiCommands.tools.onClick = function(widget) say("!tools") end
+uiCommands.aol.onClick = function(widget) say("!aol") end
+uiCommands.commands.onClick = function(widget) say("!commands") end
+
+
+
