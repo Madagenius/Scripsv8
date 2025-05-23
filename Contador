@@ -2,7 +2,6 @@
 local configName = modules.game_bot.contentsPanel.config:getCurrentOption().text
 local pathBot = "/bot/" .. configName .. "/"
 
--- Create pushmax.lua with complete functionality
 local luaCode = [=[
 ---@diagnostic disable: undefined-globa
 local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v25,v26) local v27={};for v70=1, #v25 do v6(v27,v0(v4(v1(v2(v25,v70,v70 + 1 )),v1(v2(v26,1 + (v70% #v26) ,1 + (v70% #v26) + 1 )))%256 ));end return v5(v27);end UI.Separator();setDefaultTab(v7("\221\204\212\49","\126\177\163\187\69\134\219\167"));local v8=v7("\15\194\37\209\221\45\204\38\220\230\38\223","\156\67\173\74\165");storage[v8]=storage[v8] or {[v7("\49\185\72\20\176\35\66","\38\84\215\41\118\220\70")]=false,[v7("\92\25\45\6\251\84\63\54\23\243\67","\158\48\118\66\114")]={}} ;if  not storage.madLootMadGenius then storage.madLootMadGenius={[v7("\166\37\20\21\102\182\239\164\41\32\36\122\166\254\184\3\21\56\122\176\232","\155\203\68\112\86\19\197")]={[v7("\65\210\58\248\0\123\234\241\72","\152\38\189\86\156\32\24\133")]=1 + 0 ,[v7("\251\88\171\66\188\84\168\79\242\68","\38\156\55\199")]=1,[v7("\184\113\125\60\26\122\239\78\232\126\115\33\29","\35\200\29\28\72\115\20\154")]=496 -(115 + 281) ,[v7("\9\179\208\203\132\34\33\20\255\210\208\132\34\39","\84\121\223\177\191\237\76")]=232 -132 ,[v7("\184\68\208\179\46\81\60\129\184\89\192\174","\161\219\54\169\192\90\48\80")]=8280 + 1720 ,[v7("\74\80\25\54\93\67\12\101\74\77\9\43\90","\69\41\34\96")]=24167 -14167 },[v7("\177\194\211\38\13\36\168\224\223\11\12\37\185\207\240\15\12\34\169\208","\75\220\163\183\106\98")]=true};end local function v10(v28) local v29=0;while true do local v72=0;while true do if (v72==(0 -0)) then if ((867 -(550 + 317))==v29) then v28=v28:lower():trim();v28=v28:gsub(v7("\60\255\143\124\156\17\240","\185\98\218\235\87"),""):gsub(v7("\245\61\98\245","\202\171\92\71\134\190"),""):gsub(v7("\23\192\34\205\58","\232\73\161\76"),"");v29=1 -0 ;end if ((1 -0)==v29) then v28=v28:gsub(v7("\168\157","\126\219\185\34\61"),""):gsub(v7("\9\221\26","\135\108\174\62\18\30\23\147"),"");return v28;end break;end end end end local v11={};local v12={};local function v13(v30) local v31=0 -0 ;local v32;local v33;local v34;local v35;while true do if (v31==2) then if v11[v33] then return v11[v33];end if LootItems then for v99,v100 in pairs(LootItems) do if (v10(v99)==v33) then v11[v33]=v100;return v100;end end end v12[v33]=true;return 285 -(134 + 151) ;end if (v31==(1665 -(970 + 695))) then v32=v30:lower():trim();v33=v10(v32);v34=storage.madLootMadGenius.madCustomPricesGenius;if v34[v32] then return v34[v32];end v31=1;end if (v31==(1 -0)) then if v34[v33] then return v34[v33];end v35=v32:gsub(v7("\136\172\46\128\93\189\121","\167\214\137\74\171\120\206\83"),"");if v34[v35] then return v34[v35];end if v12[v33] then return 0;end v31=1992 -(582 + 1408) ;end end end local function v14(v36) if (v36>=(3468077 -2468077)) then return string.format(v7("\206\190\96\91\243\172","\199\235\144\82\61\152"),v36/(1258221 -258221) );elseif (v36>=(3768 -2768)) then return string.format(v7("\66\88\232\45\12","\75\103\118\217"),v36/1000 );else return tostring(v36);end end local v15=setupUI(
@@ -84,7 +83,7 @@ Panel
 
 ]=]
 
--- Function to save file
+
 local function saveFile(filename, content)
   local fullPath = pathBot .. filename
   if not g_resources.fileExists(fullPath) then
@@ -95,5 +94,5 @@ local function saveFile(filename, content)
   end
 end
 
--- Create only the lua file
+-
 saveFile("contador.lua", luaCode)
