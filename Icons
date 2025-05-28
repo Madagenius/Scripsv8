@@ -21,4 +21,4 @@ local function saveFile(filename, content)
 end
 
 -- Ejecuta
-saveFile(pathBot .. "mover_iconos.lua", luaCode)
+saveFile(pathBot .. "moverIcos.lua", luaCode)
