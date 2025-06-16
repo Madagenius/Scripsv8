@@ -1,0 +1,1635 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------
+-- tBot cBot aBot cAtk
+-----------------------------------
+
+local cIcon = addIcon("cI",{text="Cave\nBot",switchable=false,moveable=true}, function()
+  if CaveBot.isOff() then 
+    CaveBot.setOn()
+  else 
+    CaveBot.setOff()
+  end
+end)
+cIcon:setSize({height=30,width=50})
+cIcon.text:setFont('verdana-11px-rounded')
+-- cIcon:breakAnchors();
+-- cIcon:move(10, 50);
+
+local tIcon = addIcon("tI",{text="Target\nBot",switchable=false,moveable=true}, function()
+  if TargetBot.isOff() then 
+    TargetBot.setOn()
+  else 
+    TargetBot.setOff()
+  end
+end)
+tIcon:setSize({height=30,width=50})
+tIcon.text:setFont('verdana-11px-rounded')
+-- tIcon:breakAnchors();
+-- tIcon:move(70, 50);
+
+macro(50,function()
+  if CaveBot.isOn() then
+    cIcon.text:setColoredText({"Cave Bot\n","white","ON","green"})
+  else
+    cIcon.text:setColoredText({"Cave Bot\n","white","OFF","red"})
+  end
+  if TargetBot.isOn() then
+    tIcon.text:setColoredText({"Target Bot\n","white","ON","green"})
+  else
+    tIcon.text:setColoredText({"Target Bot\n","white","OFF","red"})
+  end
+end)
+
+
+
+local function activeDrag(icon, nameMacro, position)
+cIcon:breakAnchors()
+cIcon:move(position.posX or 10, position.posY or 50)
+
+local dobleclick = false
+cIcon.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+cIcon.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+cIcon:breakAnchors()
+cIcon.movingReference = { x = mousePos.x - cIcon:getX(), y = mousePos.y - cIcon:getY() }
+dobleclick = false
+return true
+end
+
+cIcon.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+cIcon.moving = { x = cIcon:getX(), y = cIcon:getY() }
+return true
+end
+
+cIcon.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = cIcon.moving.x, posY = cIcon.moving.y }
+end
+end
+
+activeDrag(cIcon, 'cI', storage.cI or {})
+
+local function activeDrag(icon, nameMacro, position)
+tIcon:breakAnchors()
+tIcon:move(position.posX or 70, position.posY or 50)
+
+local dobleclick = false
+tIcon.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+tIcon.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+tIcon:breakAnchors()
+tIcon.movingReference = { x = mousePos.x - tIcon:getX(), y = mousePos.y - tIcon:getY() }
+dobleclick = false
+return true
+end
+
+tIcon.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+tIcon.moving = { x = tIcon:getX(), y = tIcon:getY() }
+return true
+end
+
+tIcon.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = tIcon.moving.x, posY = tIcon.moving.y }
+end
+end
+
+activeDrag(tIcon, 'tI', storage.tI or {})
+
+---------
+
+local aBot = addIcon("aB",{text="Attack Bot",switchable=false,moveable=true}, function()
+  if AttackBot.isOff() then 
+    AttackBot.setOn()
+  else 
+    AttackBot.setOff()
+  end
+end)
+aBot:setSize({height=30,width=50})
+aBot.text:setFont('verdana-11px-rounded')
+ 
+macro(50,function()
+  if AttackBot.isOn() then
+    aBot.text:setColoredText({"ATTACK BOT\n","white","ON","green"})
+  else
+    aBot.text:setColoredText({"Attack Bot\n","white","OFF","red"})
+  end
+end)
+local function activeDrag(icon, nameMacro, position)
+  aBot:breakAnchors()
+  aBot:move(position.posX or 60, position.posY or 350)
+
+  local dobleclick = false
+  icon.onDoubleClick = function()
+    dobleclick = true
+    schedule(1500, function()
+      dobleclick = false
+    end)
+  end
+
+  aBot.onDragEnter = function(widget, mousePos)
+    if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+      return false
+    end
+    aBot:breakAnchors()
+    aBot.movingReference = { x = mousePos.x - aBot:getX(), y = mousePos.y - aBot:getY() }
+    dobleclick = false
+    return true
+  end
+
+  aBot.onDragMove = function(widget, mousePos, moved)
+    local parentRect = widget:getParent():getRect()
+    local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+    local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+    widget:move(x, y)
+    aBot.moving = { x = aBot:getX(), y = aBot:getY() }
+    return true
+  end
+
+  aBot.onDragLeave = function(widget, pos)
+    storage[nameMacro] = { posX = aBot.moving.x, posY = aBot.moving.y }
+  end
+end
+
+activeDrag(aBot, 'aB', storage.aB or {})
+
+-----
+
+local cancelAtaq = addIcon("stopAttack", {item = 12546, text = "STOP ATTAK", switchable = false}, function(widget, isOn)
+    g_game.cancelAttackAndFollow()
+    g_game.cancelAttackAndFollow()
+    g_game.cancelAttackAndFollow()
+end)
+-- cancelAtaq:breakAnchors();
+-- cancelAtaq:move(400, 440);
+
+
+local function activeDrag(icon, nameMacro, position)
+cancelAtaq:breakAnchors()
+cancelAtaq:move(position.posX or 60, position.posY or 350)
+
+local dobleclick = false
+cancelAtaq.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+cancelAtaq.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+cancelAtaq:breakAnchors()
+cancelAtaq.movingReference = { x = mousePos.x - cancelAtaq:getX(), y = mousePos.y - cancelAtaq:getY() }
+dobleclick = false
+return true
+end
+
+cancelAtaq.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+cancelAtaq.moving = { x = cancelAtaq:getX(), y = cancelAtaq:getY() }
+return true
+end
+
+cancelAtaq.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = cancelAtaq.moving.x, posY = cancelAtaq.moving.y }
+end
+end
+
+activeDrag(cancelAtaq, 'stopAttack', storage.stopAttack or {})
+
+
+local amulet = 3081
+local might = 3048
+local SsaMightFull = macro(170, "SSA - MIGHT", function()
+if getNeck() == nill or getNeck():getId() ~= amulet then
+g_game.equipItemId(amulet)
+delay(30)
+end
+if getFinger() == nill or getFinger():getId() ~= might then
+g_game.equipItemId(might)
+delay(30)
+end
+end)
+local SsaMightFull = addIcon("SsaMightFul", {item =35523, text = "SSA-MIG",  }, SsaMightFull)
+-- SsaMightFull:breakAnchors()
+-- SsaMightFull:move(820, 20)
+
+
+
+local function activeDrag(icon, nameMacro, position)
+SsaMightFull:breakAnchors()
+SsaMightFull:move(position.posX or 810, position.posY or 20)
+
+local dobleclick = false
+SsaMightFull.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+SsaMightFull.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+SsaMightFull:breakAnchors()
+SsaMightFull.movingReference = { x = mousePos.x - SsaMightFull:getX(), y = mousePos.y - SsaMightFull:getY() }
+dobleclick = false
+return true
+end
+
+SsaMightFull.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+SsaMightFull.moving = { x = SsaMightFull:getX(), y = SsaMightFull:getY() }
+return true
+end
+
+SsaMightFull.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = SsaMightFull.moving.x, posY = SsaMightFull.moving.y }
+end
+end
+
+activeDrag(SsaMightFull, 'SsaMightFul', storage.SsaMightFul or {})
+
+
+flwT = addIcon("flwT", {item =16201, text = "FOLLOW"}, 
+macro(250, "", function()
+   if g_game.isOnline() and g_game.isAttacking() then
+         g_game.setChaseMode(1)
+           end
+           end) )
+-- flwT:breakAnchors()
+-- flwT:move(10, 90)
+
+
+
+local function activeDrag(icon, nameMacro, position)
+flwT:breakAnchors()
+flwT:move(position.posX or 10, position.posY or 90)
+
+local dobleclick = false
+flwT.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+flwT.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+flwT:breakAnchors()
+flwT.movingReference = { x = mousePos.x - flwT:getX(), y = mousePos.y - flwT:getY() }
+dobleclick = false
+return true
+end
+
+flwT.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+flwT.moving = { x = icon:getX(), y = icon:getY() }
+return true
+end
+
+flwT.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = flwT.moving.x, posY = flwT.moving.y }
+end
+end
+
+activeDrag(flwT, 'flwT', storage.flwT or {})
+
+-------
+
+local oldTarget = macro(570, "", nil, function()
+  if g_game.isAttacking() then
+    oldTarget = g_game.getAttackingCreature()
+  end
+  if (oldTarget and oldTarget:getPosition()) then
+    if (not g_game.isAttacking() and getDistanceBetween(pos(), oldTarget:getPosition()) <= 8) then
+      if (oldTarget:getPosition().z == posz()) then
+        g_game.attack(oldTarget)
+      end
+    end
+ end
+end)
+
+oldTarget = addIcon("oldTarget", {item =2025, text = "HOLD"}, oldTarget )
+-- oldTarget:breakAnchors();
+-- oldTarget:move(70, 90);
+
+
+
+local function activeDrag(icon, nameMacro, position)
+oldTarget:breakAnchors()
+oldTarget:move(position.posX or 70, position.posY or 90)
+
+local dobleclick = false
+oldTarget.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+oldTarget.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+oldTarget:breakAnchors()
+oldTarget.movingReference = { x = mousePos.x - oldTarget:getX(), y = mousePos.y - oldTarget:getY() }
+dobleclick = false
+return true
+end
+
+oldTarget.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+oldTarget.moving = { x = oldTarget:getX(), y = oldTarget:getY() }
+return true
+end
+
+oldTarget.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = oldTarget.moving.x, posY = oldTarget.moving.y }
+end
+end
+
+activeDrag(oldTarget, 'oldTarget', storage.oldTarget or {})
+----
+----
+---- USE ALL ------
+function distanceFromPlayer(position)
+    local playerPosition = g_game.getLocalPlayer():getPosition()
+    return math.max(math.abs(playerPosition.x - position.x), math.abs(playerPosition.y - position.y))
+end
+--[Use All]
+--Modded from vBot 4.8
+storage.shovel = 3457
+storage.rope = 3003
+storage.machete = 3308
+storage.scythe = 3453
+
+local useId = { 34847, 1764, 21051, 30823, 6264, 5282, 20453, 20454, 20474, 11708, 11705, 
+                6257, 6256, 2772, 27260, 2773, 1632, 1633, 1948, 435, 6252, 6253, 5007, 4911, 
+                1629, 1630, 5108, 5107, 5281, 1968, 435, 1948, 5542, 31116, 31120, 30742, 31115, 
+                31118, 20474, 5737, 5736, 5734, 5733, 31202, 31228, 31199, 31200, 33262, 30824, 
+                5125, 5126, 5116, 5117, 8257, 8258, 8255, 8256, 5120, 30777, 30776, 23873, 23877,
+                5736, 6264, 31262, 31130, 31129, 6250, 6249, 5122, 30049, 7131, 7132, 7727 }
+local shovelId = { 606, 593, 867, 608 }
+local ropeId = { 17238, 12202, 12935, 386, 421, 21966, 14238 }
+local macheteId = { 2130, 3696 }
+local scytheId = { 3653 }
+
+useAll = macro(530, "", function(self)
+    for _, tile in pairs(g_map.getTiles(posz())) do
+        if distanceFromPlayer(tile:getPosition()) < 2 then
+            for _, item in pairs(tile:getItems()) do
+                -- use
+                if table.find(useId, item:getId()) then
+                    use(item)
+                    useAll.setOff()
+                    return
+                elseif table.find(shovelId, item:getId()) then
+                    useWith(storage.shovel, item)
+                    useAll.setOff()
+                    return
+                elseif table.find(ropeId, item:getId()) then
+                    useWith(storage.rope, item) 
+                    useAll.setOff()
+                    return
+                elseif table.find(macheteId, item:getId()) then
+                    useWith(storage.machete, item)
+                    useAll.setOff()
+                    return
+                elseif table.find(scytheId, item:getId()) then
+                    useWith(storage.scythe, item)
+                    useAll.setOff()
+                    return
+                end
+            end
+        end
+    end
+ self.setOn(false)
+end)
+
+useAllPro = addIcon("useall", {item =19083, text = "USE ALL", switchable = false}, function()
+    if useAll.isOn() then
+        useAll.setOff()
+    else
+        useAll.setOn()
+    end
+end)
+-- useAllPro:breakAnchors()
+-- useAllPro:move(240, 440)
+
+
+
+local function activeDrag(icon, nameMacro, position)
+useAllPro:breakAnchors()
+useAllPro:move(position.posX or 220, position.posY or 440)
+
+local dobleclick = false
+useAllPro.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+useAllPro.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+useAllPro:breakAnchors()
+useAllPro.movingReference = { x = mousePos.x - useAllPro:getX(), y = mousePos.y - useAllPro:getY() }
+dobleclick = false
+return true
+end
+
+useAllPro.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+useAllPro.moving = { x = useAllPro:getX(), y = useAllPro:getY() }
+return true
+end
+
+useAllPro.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = useAllPro.moving.x, posY = useAllPro.moving.y }
+end
+end
+
+activeDrag(useAllPro, 'useall', storage.useall or {})
+
+-----------
+---- minimal
+
+
+local minimapWindow = modules.game_minimap.minimapWindow
+local rootWidget = g_ui.getRootWidget()
+local lastPos = {x = 150, y = 100}
+local tam = math.floor(rootWidget:getRect().height/1.8)
+local miniMapIcon = addIcon("toggleMiniMap", {item=43739, text="MAP"}, function(icon, isOn)
+    if isOn then
+        minimapWindow:setParent(modules.game_interface.getRootPanel())
+        minimapWindow:show()
+        minimapWindow:move(lastPos.x, lastPos.y)
+        minimapWindow:resize(tam, tam)
+    else
+        minimapWindow:setParent(modules.game_interface.getRightPanel())
+        minimapWindow:hide()
+        minimapWindow:resize(192, 150)
+        minimapWindow:setMarginLeft(0)
+    end
+end)
+
+local copyOnDrag = minimapWindow.onDragLeave
+
+minimapWindow.onDragLeave = function(widget, droppedWidget, mousePos)
+    copyOnDrag(widget, droppedWidget, mousePos)
+    lastPos = {x = minimapWindow:getX(), y = minimapWindow:getY()}
+end
+
+rootWidget.onGeometryChange[7] = function(widget)
+    if minimapWindow:isHidden() then return end
+    tam = math.floor(rootWidget:getRect().height/1.8)
+    minimapWindow:resize(tam, tam)
+end
+
+
+
+local function activeDrag(icon, nameMacro, position)
+  icon:breakAnchors()
+  icon:move(position.posX or 280, position.posY or 440)
+
+  local dobleclick = false
+  icon.onDoubleClick = function()
+    dobleclick = true
+    schedule(1500, function()
+      dobleclick = false
+    end)
+  end
+
+  icon.onDragEnter = function(widget, mousePos)
+    if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+      return false
+    end
+    icon:breakAnchors()
+    icon.movingReference = { x = mousePos.x - icon:getX(), y = mousePos.y - icon:getY() }
+    dobleclick = false
+    return true
+  end
+
+  icon.onDragMove = function(widget, mousePos, moved)
+    local parentRect = widget:getParent():getRect()
+    local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+    local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+    widget:move(x, y)
+    icon.moving = { x = icon:getX(), y = icon:getY() }
+    return true
+  end
+
+  icon.onDragLeave = function(widget, pos)
+    storage[nameMacro] = { posX = icon.moving.x, posY = icon.moving.y }
+  end
+end
+
+activeDrag(miniMapIcon, 'toggleMiniMap', storage.toggleMiniMap or {})
+
+---------------
+
+local bugMapMobile = {};
+
+local cursorWidget = g_ui.getRootWidget():recursiveGetChildById('pointer');
+
+local initialPos = { x = cursorWidget:getPosition().x / cursorWidget:getWidth(), y = cursorWidget:getPosition().y / cursorWidget:getHeight() };
+
+local availableKeys = {
+    ['Up'] = { 0, -6 },
+    ['Down'] = { 0, 6 },
+    ['Left'] = { -7, 0 },
+    ['Right'] = { 7, 0 }
+};
+
+function bugMapMobile.logic()
+    local pos = pos();
+    local keypadPos = { x = cursorWidget:getPosition().x / cursorWidget:getWidth(), y = cursorWidget:getPosition().y / cursorWidget:getHeight() };
+    local diffPos = { x = initialPos.x - keypadPos.x, y = initialPos.y - keypadPos.y };
+
+    if (diffPos.y < 0.46 and diffPos.y > -0.46) then
+        if (diffPos.x > 0) then
+            pos.x = pos.x + availableKeys['Left'][1];
+        elseif (diffPos.x < 0) then
+            pos.x = pos.x + availableKeys['Right'][1];
+        else return end
+    elseif (diffPos.x < 0.46 and diffPos.x > -0.46) then
+        if (diffPos.y > 0) then
+            pos.y = pos.y + availableKeys['Up'][2];
+        elseif (diffPos.y < 0) then
+            pos.y = pos.y + availableKeys['Down'][2];
+        else return; end
+    end
+    local tile = g_map.getTile(pos);
+    if (not tile) then return; end
+
+    g_game.use(tile:getTopUseThing());
+end
+
+iconBugMap = macro(18, "", bugMapMobile.logic);
+positions = addIcon("bMp", {item = 10200, text= "BUGMAP"}, iconBugMap )
+-- positions:breakAnchors();
+-- positions:move(500, 440);
+
+
+local function activeDrag(icon, nameMacro, position)
+positions:breakAnchors()
+positions:move(position.posX or 790, position.posY or 440)
+
+local dobleclick = false
+positions.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+positions.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+positions:breakAnchors()
+positions.movingReference = { x = mousePos.x - positions:getX(), y = mousePos.y - positions:getY() }
+dobleclick = false
+return true
+end
+
+positions.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+positions.moving = { x = positions:getX(), y = positions:getY() }
+return true
+end
+
+positions.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = positions.moving.x, posY = positions.moving.y }
+end
+end
+
+activeDrag(positions, 'bMp', storage.bMp or {})
+
+
+
+limpTxt = macro(800, "HIDE TEXT 1s", function() modules.game_textmessage.clearMessages()
+  g_map.cleanTexts()
+end)
+
+limpTxt = addIcon("NoOrangeTxt", {item= 35614,  text= "HIDE TEXTs"}, limpTxt)
+-- limpTxt:breakAnchors();
+-- limpTxt:move(330, 30);
+
+local function activeDrag(icon, nameMacro, position)
+limpTxt:breakAnchors()
+limpTxt:move(position.posX or 330, position.posY or 30)
+
+local dobleclick = false
+limpTxt.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+limpTxt.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+limpTxt:breakAnchors()
+limpTxt.movingReference = { x = mousePos.x - limpTxt:getX(), y = mousePos.y - limpTxt:getY() }
+dobleclick = false
+return true
+end
+
+limpTxt.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+limpTxt.moving = { x = limpTxt:getX(), y = limpTxt:getY() }
+return true
+end
+
+limpTxt.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = limpTxt.moving.x, posY = limpTxt.moving.y }
+end
+end
+
+activeDrag(limpTxt, 'NoOrangeTxt', storage.NoOrangeTxt or {})
+
+
+
+
+
+if not storage.AntiPushItems then
+    storage.AntiPushItems = "3031,3035"
+  end
+ 
+  addSeparator()
+  addLabel("antiPushItemsLabel", "Anti Push Items:")
+  addTextEdit("antiPushItemsTxtEdit", storage.AntiPushItems, function(widget, text)
+    storage.AntiPushItems = text
+  end)
+  addSeparator()
+ 
+  local function stringToTable(inputstr, sep)
+    if sep == nil then
+      sep = ","
+    end
+    local t = {}
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+          table.insert(t, tonumber(str))
+    end
+    return t
+  end
+ 
+  local goldIds = 
+  {
+    [3031] = 3035,
+    [3035] = 3043
+  }
+ 
+  local function AntiPush()
+    local dropItems = stringToTable(storage.AntiPushItems)
+    local tile = g_map.getTile(pos())
+    if not tile  then return end
+    local thing = tile:getTopThing()
+    if not thing then return end
+    for i, item in pairs(dropItems) do
+      if item ~= thing:getId() then
+        local dropItem = findItem(item)
+        if dropItem then
+          if dropItem:getCount() == 1 then
+            g_game.move(dropItem, pos(), 1)
+          else
+            g_game.move(dropItem, pos(), 2)
+          end
+        elseif goldIds[item] ~= nil then
+          --change gold
+          local nextCurrency = findItem(goldIds[item])
+          if not nextCurrency then return end
+          g_game.use(nextCurrency)
+        end
+      end
+    end
+  end
+  local isOn = false
+  local antiPushIcon = addIcon("antipushIcon", {item={id=3043, count=3}, text="Anti PUSH"},           
+  macro(600, function(m)
+    AntiPush()
+    isOn = true
+    schedule(600, function() 
+      if m.isOff() then
+       isOn=false 
+      end
+    end)
+  end))
+ 
+  onPlayerPositionChange(function() 
+    if not isOn then return end
+      AntiPush()
+  end)
+ 
+  -- antiPushIcon:breakAnchors()
+  -- antipushIcon:move(80,80)
+
+
+
+local function activeDrag(icon, nameMacro, position)
+antiPushIcon:breakAnchors()
+antiPushIcon:move(position.posX or 70, position.posY or 150)
+
+local dobleclick = false
+antiPushIcon.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+antiPushIcon.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+antiPushIcon:breakAnchors()
+antiPushIcon.movingReference = { x = mousePos.x - antiPushIcon:getX(), y = mousePos.y - antiPushIcon:getY() }
+dobleclick = false
+return true
+end
+
+antiPushIcon.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+antiPushIcon.moving = { x = antiPushIcon:getX(), y = antiPushIcon:getY() }
+return true
+end
+
+antiPushIcon.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = antiPushIcon.moving.x, posY = antiPushIcon.moving.y }
+end
+end
+
+activeDrag(antiPushIcon, 'antipushIcon', storage.antipushIcon or {})
+
+-------
+
+local aPushTrash = macro(255, "", function()
+    local trashitem = nil
+    for _, tile in pairs(g_map.getTiles(posz())) do
+        if distanceFromPlayer(tile:getPosition()) == 1 and #tile:getItems() ~= 0 and not tile:getTopUseThing():isNotMoveable() then
+            trashitem = tile:getTopUseThing()
+            g_game.move(trashitem, pos(), trashitem:getCount())
+            return
+        end
+    end
+ end)
+aPushTrash = addIcon("trashantiPush", {item =38376, text = "Ant Push Trash"}, aPushTrash )
+-- aPushTrash:breakAnchors();
+-- aPushTrash:move(10, 150);
+
+
+local function activeDrag(icon, nameMacro, position)
+aPushTrash:breakAnchors()
+aPushTrash:move(position.posX or 10, position.posY or 150)
+
+local dobleclick = false
+aPushTrash.onDoubleClick = function()
+dobleclick = true
+schedule(1500, function()
+dobleclick = false
+end)
+end
+
+aPushTrash.onDragEnter = function(widget, mousePos)
+if not dobleclick and not g_keyboard.isKeyPressed("F1") then
+return false
+end
+aPushTrash:breakAnchors()
+aPushTrash.movingReference = { x = mousePos.x - aPushTrash:getX(), y = mousePos.y - aPushTrash:getY() }
+dobleclick = false
+return true
+end
+
+aPushTrash.onDragMove = function(widget, mousePos, moved)
+local parentRect = widget:getParent():getRect()
+local x = math.min(math.max(parentRect.x, mousePos.x - widget.movingReference.x), parentRect.x + parentRect.width - widget:getWidth())
+local y = math.min(math.max(parentRect.y - widget:getParent():getMarginTop(), mousePos.y - widget.movingReference.y), parentRect.y + parentRect.height - widget:getHeight())
+widget:move(x, y)
+aPushTrash.moving = { x = aPushTrash:getX(), y = aPushTrash:getY() }
+return true
+end
+
+aPushTrash.onDragLeave = function(widget, pos)
+storage[nameMacro] = { posX = aPushTrash.moving.x, posY = aPushTrash.moving.y }
+end
+end
+
+activeDrag(aPushTrash, 'trashantiPush', storage.trashantiPush or {})
+
+--------------
+setDefaultTab("hp")
+
+UI.Label("Heal Spell: 50mlsecs")
+local hpPercent = 90
+local xura = macro(100, "EXURA MED ICO -90%",  function()
+  if (hppercent() <= hpPercent) then
+  say(storage.HealText)
+end
+end)
+addTextEdit("HealText", storage.HealText or "exura med ico", function(widget, text) 
+storage.HealText = text
+end)
+local xura = addIcon("xura", {text = "MED ICO"}, function(self, isOn)
+    self.item:setItemId(isOn and 30060 or 30059)
+    xura.setOn(isOn)
+end)
+xura:breakAnchors();
+xura:move(540, 17);
+
+local healthId = 23375
+local healthPercent = 85
+local hpPot = macro(200, "SUPREME EK - 85%",  function()
+  if (hppercent() <= healthPercent) then
+    usewith(healthId, player) 
+  end
+end)
+
+local manaPot = macro(250, "MANA EK - 70%", function()
+  if (manapercent() < 70 ) then
+         usewith(237, player)
+  end
+end)
+UI.Separator()
+-----
+UI.Label("HEAL SYSTEM II")
+-----
+UI.Separator()
+
+Panels.Health()
+UI.Separator()
+Panels.HealthItem()
+Panels.ManaItem()
+
+UI.Separator()
+-----
+setDefaultTab("main")
+
+UI.Separator()
+local infoTime = 0
+local talkTime = 0
+local maxLevel = 0
+local minLevel = 0
+local justForInfo = true
+local canSeeInfo = true
+local partyMembersCount = 0
+
+local partyLeaderHuntWidget = macro(1000, "Party Leader Hunt", function()
+  if not player:isPartyLeader() then
+    justForInfo = true
+    partyMembersCount = 0
+    return
+  end
+  if justForInfo and canSeeInfo then
+    sayChannel(getChannelId("party"), "!party info")
+    return
+  end
+  if talkTime > 0 then
+    talkTime = talkTime - 1
+  end
+  if player:getShield() == 10 then
+    infoTime = infoTime + 1
+    if infoTime >= 20 then
+      sayChannel(getChannelId("party"), "!party info")
+      infoTime = 0
+    end
+  else
+    infoTime = 0
+  end
+end)
+
+addLabel("maxLevel", "Max Level:")
+addTextEdit("maxLevel", storage.maxLevel or "", function(widget, text)
+  if tonumber(text) then
+    maxLevel = tonumber(text)
+  else
+    sayChannel(getChannelId("party"), "!party info")
+  end
+  storage.maxLevel = tonumber(text)
+end)
+
+addLabel("minLevel", "Min Level:")
+addTextEdit("minLevel", storage.minLevel or "", function(widget, text)
+  if tonumber(text) then
+    minLevel = tonumber(text)
+  else
+    sayChannel(getChannelId("party"), "!party info")
+  end
+  storage.minLevel = tonumber(text)
+end)
+
+onTalk(function(name, level, mode, text, channelId, pos)
+  if partyLeaderHuntWidget:isOn() then
+    if name == player:getName() then return end
+    if text:lower():find("pt") or (text:lower():find("party") and not text:lower():find("!party")) then
+      for _, spec in ipairs(getSpectators()) do
+        if spec:getName() == name then
+          if spec:isPartyMember() then return end
+          if spec:getShield() == 2 then
+            return
+          end
+          if level > maxLevel or level < minLevel then
+            g_game.talkPrivate(5, name, name .. ", the minimum level is " .. minLevel .. " and the maximum is " .. maxLevel)
+            return
+          end
+          if partyMembersCount >= 30 then
+            return
+          end
+          g_game.partyInvite(spec:getId())
+          g_game.partyShareExperience(not player:isPartySharedExperienceActive())
+        end
+      end
+    end
+  end
+end)
+
+onLoginAdvice(function(text)
+  if partyLeaderHuntWidget:isOn() then
+    local explode1 = string.explode(text, "*")
+    local explode2 = string.explode(explode1[8], ":")[2]
+    if not storage.maxLevel then
+      maxLevel = math.ceil(tonumber(string.explode(explode1[4], ":")[2])*3/2)
+    else
+      maxLevel = storage.maxLevel
+    end
+    if not storage.minLevel then
+      minLevel = math.ceil(tonumber(string.explode(explode1[3], ":")[2])*2/3)
+    else
+      minLevel = storage.minLevel
+    end
+    partyMembersCount = tonumber(string.explode(explode1[2], ":")[2])
+    if justForInfo then
+      justForInfo = false
+      return
+    end
+    if explode2:find(",") then
+      local names = string.explode(explode2, ",")
+      for i = 1, #names do
+        canSeeInfo = false
+        schedule(1000 * i, function()
+          if i == #names then
+            canSeeInfo = true
+          end
+          sayChannel(getChannelId("party"), "!party kick," .. names[i])
+        end)
+      end
+    elseif explode2 ~= "" then
+      schedule(1200, function() sayChannel(getChannelId("party"), "!party kick," .. explode2) end)
+    end
+  end
+end)
+
+onCreatureAppear(function(creature)
+  if partyLeaderHuntWidget:isOn() then
+    if not creature:isPlayer() then return end
+    if creature:isLocalPlayer() then return end
+    if creature:getShield() == 2 then return end
+    if creature:isPartyMember() then return end
+    if talkTime == 0 and partyMembersCount < 30 then
+      say("SAY PT...")
+      talkTime = 15
+    end
+  end
+end)
+
+onTextMessage(function(mode, text)
+  if partyLeaderHuntWidget:isOn() then
+    if text:lower():find("you are now the leader of the party.") or text:lower():find("has joined the party.") or (text:lower():find("has left the party.") and canSeeInfo) then
+      justForInfo = true
+    end
+  end
+end)
+
+
+UI.Separator()
+macro(1000,"Auto Aceptar Party",function() 
+  if player:getShield() > 2 then return end -- already in a party
+  for s, spec in pairs(getSpectators(false)) do
+    if spec:getShield() == 1 then
+      g_game.partyJoin(spec:getId())
+      delay(1000)
+    end
+  end
+end)
+
+---
+setDefaultTab("first")
+
+
+UI.Separator()
+local distance = 5
+Exoris = macro(200, "ATK - ANTIRED",  function()
+    local playerInScreen = false
+    if not g_game.isAttacking() then
+        return
+    end
+    for i,mob in ipairs(getSpectators()) do
+        if (getDistanceBetween(player:getPosition(), mob:getPosition())  <= distance and mob:isPlayer())  and (player:getName() ~= mob:getName()) then
+            playerInScreen = true
+        end
+    end
+
+    if not playerInScreen then 
+      say("exori gran")
+      delay(900)
+      say("exori")
+      delay(900)
+      end
+    if g_game.isAttacking() then
+       saySpell('Exori hur', 2000)
+ end
+end)
+
+
+local detectRange = 8
+local time = 2000
+----------------
+macro(100, "ANTI PLAYER - v2.0/s", function()
+    if getPlayers(detectRange) ~= 0 then
+        TargetBot.delay(time)
+        return
+    end
+end)
+
+
+UI.Separator()
+
+exoHur= macro(500, "Exori Hur", function()
+  if g_game.isAttacking() then 
+   say("exori hur")   
+   delay(4750)
+  end
+end)
+ 
+exoHur = addIcon("exoHur", {item=7434, text="Exori Hur"}, exoHur)
+exoHur:breakAnchors()
+exoHur:move(130, 30)
+ 
+UI.Separator()
+macro(600, "Utito Tempo 10s", function()
+say("utito tempo")
+delay(10100)
+end)
+ 
+macro(600, "Utamo Tempo 10s", function()
+say("utamo tempo")
+delay(10100)
+end)
+UI.Separator()
+ 
+ 
+local ExRes = macro(2100, "Exeta Res I",  function()
+  say(storage.ExetaText)
+end)
+addTextEdit("ExetaText", storage.ExetaText or "Exeta res", function(widget, text) 
+storage.ExetaText = text
+end)
+ 
+macro(2400, "Exeta Res II",  function()
+  say(storage.ExetaText)
+end)
+addTextEdit("ExetaText", storage.ExetaText or "Exeta amp res", function(widget, text) 
+storage.ExetaText = text
+end)
+
+setDefaultTab("extras")
+
+UI.Separator()
+storage.followLeader = storage.followLeader or "Quentin"
+
+FollowMacro = macro(1231321321, "Follow", function() end)
+
+addTextEdit("playerToFollow", storage.followLeader, function(widget, text)
+  storage.followLeader = text
+end)
+
+
+onCreaturePositionChange(function(creature, newPos, oldPos)
+  if FollowMacro:isOff() then return end
+
+  if newPos and oldPos and creature:getName() == player:getName() and getCreatureByName(storage.followLeader) == nil and newPos.z > oldPos.z then
+    say('exani tera')
+    for i = -1, 1 do
+      for j = -1, 1 do
+        local useTile = g_map.getTile({ x = posx() + i, y = posy() + j, z = posz() })
+        g_game.use(useTile:getTopUseThing())
+      end
+    end
+  end
+  if creature:getName() == storage.followLeader then
+    if not newPos then
+      if oldPos then
+        lastPos = oldPos
+
+        schedule(200, function()
+          autoWalk(oldPos)
+        end)
+      end
+
+      schedule(1000, function()
+        for i = -1, 1 do
+          for j = -1, 1 do
+            local useTile = g_map.getTile({ x = posx() + i, y = posy() + j, z = posz() })
+            if useTile then
+              local top useTile:getTopUseThing()
+              if top then
+                g_game.use(top)
+              end
+            end
+          end
+        end
+      end)
+    end
+
+    if not newPos or not oldPos then return end
+    if oldPos.z == newPos.z then
+      schedule(300, function()
+        local useTile = g_map.getTile({ x = oldPos.x, y = oldPos.y, z = oldPos.z })
+        topThing = useTile:getTopThing()
+
+        if not useTile:isWalkable() then
+          use(topThing)
+        end
+      end)
+
+
+      autoWalk({ x = oldPos.x, y = oldPos.y, z = oldPos.z })
+    else
+      lastPos = oldPos
+      autoWalk(oldPos)
+      for i = 1, 6 do
+        schedule(i * 200, function()
+          autoWalk(oldPos)
+
+          if getDistanceBetween(pos(), oldPos) == 0 and (posz() > newPos.z and getCreatureByName(storage.followLeader) == nil) then
+            say('exani tera')
+          end
+        end)
+      end
+      local useTile = g_map.getTile({ x = newPos.x, y = newPos.y - 1, z = oldPos.z })
+      g_game.use(useTile:getTopUseThing())
+    end
+  end
+end)
+
+UI.Separator()
+
+UI.Separator()
+UI.Label("Items")
+-- Verifica si storage.pickUp no es una tabla, si no lo es, asigna una tabla con valores predeterminados
+if type(storage.pickUp) ~= "table" then
+  storage.pickUp = {3725, 3723}
+end
+ 
+-- Verifica si storage.containerpickUp no es una tabla, si no lo es, asigna una tabla con valores predeterminados
+if type(storage.containerpickUp) ~= "table" then
+  storage.containerpickUp = {5926}
+end
+ 
+-- Crea un contenedor para los items a recolectar
+local pickUpContainer = UI.Container(function(widget, items)
+  storage.pickUp = items
+end, true)
+pickUpContainer:setHeight(54)
+pickUpContainer:setItems(storage.pickUp)
+ 
+-- Cantidad de SQM alrededor del personaje que va a chequear
+local CheckPOS = 8
+ 
+UI.Label("Backpack ")
+ 
+-- Crea un contenedor para los containers donde se guardarÃ¡n los items recolectados
+local containerpickUpContainer = UI.Container(function(widget, items)
+  storage.containerpickUp = items
+end, true)
+containerpickUpContainer:setHeight(54)
+containerpickUpContainer:setItems(storage.containerpickUp)
+-- Macro para recolectar items del suelo cada 20 milisegundos
+local vortex = macro(230, "VORTEX", "", function()
+  if not storage.pickUp[1] then return end
+  for x = -CheckPOS, CheckPOS do
+    for y = -CheckPOS, CheckPOS do
+      local tile = g_map.getTile({x = posx() + x, y = posy() + y, z = posz()})
+      if tile then
+        local things = tile:getThings()
+        for a, item in pairs(things) do
+          for c, recolectar in pairs(storage.pickUp) do
+            if table.find(recolectar, item:getId()) then
+              local containers = getContainers()
+              for _, container in pairs(containers) do            
+                for g, guardar in pairs(storage.containerpickUp) do
+                  if table.find(guardar, container:getContainerItem():getId()) then
+                    g_game.move(item, container:getSlotPosition(container:getItemsCount()), item:getCount())                
+                  end  
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end)
+vortex.switch:setColor("green")
+
+------ WHITE TEXT ICONS
+ 
+local panel = g_ui.getRootWidget():recursiveGetChildById('gameMapPanel')
+macro(100, function()
+    for i, child in ipairs(panel:getChildren()) do
+        if child:getStyleName() == "BotIcon" then
+            if child.text:getColor().r == 255 then
+                child.text:setColor("white")
+            end
+        end
+    end
+end)
+ 
+------- NO WARNS
+ 
+warning = function() 
+    --Made
+    --This will remove lots of others warning messages too, be warned ;P
+    return  
+end
+
+local NPCsAndCities = {
+  ["Captain Bluebear"] = "Ab'Dendriel, Arcadia, Carlin, Edron, Krailos, Liberty Bay, Oramond, Port Hope,  Rangiroa, Roshamuul, Svargrond, Venore, Yalahar",
+  ["Captain Fearless"] = "Ab'Dendriel, Ankrahmun, Arcadia, Carlin, Darashia, Edron, Gray Island, Issavi, Liberty Bay, Port Hope, Rangiroa, Svargrond, Thais, Yalahar",
+  ["Captain Greyhound"] = "Thais, Ab'dendriel, Venore, Svargrond, Yalahar, Rangiroa, Arcadia, Edron",
+  ["Captain Seahorse"] = "Ab'Dendriel, Ankrahmun, Carlin, Cormaya, Gray Island, Gunther, Liberty Bay, Port Hope, Thais, Venore", 
+  ["Captain Frank"] = "Venore",
+  ["Captain Breezelda"] = "Arcadia, Carlin, Thais, Venore",
+  ["Captain Seagull"] = "Carlin, Edron, Gray Island, Thais, Venore, Yalahar",
+  ["Captain Sinbeard"] = "Darashia, Edron, Liberty Bay, Port Hope, Travora, Venore, Yalahar",
+  ["Captain Grenald"] = "Carlin, Svargrond, Thais, Venore, Yalahar",
+  ["Captain Chelop"] = "Thais",
+  ["Captain Harava"] = "Darashia, Krailos, Oramond, Venore",
+  ["Captain Pelagia"] = "Darashia, Edron, Issavi, Oramond, Venore",
+  ["Captain Gulliver"] = "Edron, Issavi, Krailos, Port Hope, Thais, Venore",
+  ["Captain Jack"] = "Tibia", 
+  ["Karith"] = "Ab'Dendriel, Ankrahmun, Arcadia, Carlin, Darashia, Liberty Bay, Port Hope, Thais, Venore",
+  ["Charles"] = "Ankrahmun, Darashia, Edron, Liberty Bay, Thais, Venore, Yalahar",
+  ["Jack Fate"] = "Ankrahmun, Darashia, Edron, Port Hope, Thais, Venore, Yalahar",
+  ["Scrutinon"] = "Ab'dendriel, Edron, Darashia, Venore",
+  ["Petros"] = "Ankrahmun, Gray Island, Issavi, Liberty Bay, Port Hope, Venore, Yalahar",
+  ["Pemaret"] = "Edron",
+  ["Chemar"] = "Edron, Farmine, Femor Hills, Issavi, Kazordoon, Svargrond",
+  ["Tanyt"] = "Darashia, Edron, Farmine, Femor Hills, Kazordoon, Svargrond",
+  ["Pino"] = "Darashia, Farmine, Femor Hills, Issavi, Kazordoon, Svargrond",
+  ["Uzon"] = "Darashia, Edron, Farmine, Issavi, Kazordoon, Svargrond",
+  ["Gewen"] = "Darashia, Edron, Farmine, Femor Hills, Issavi, Svargrond, Weekly Ticket",
+  ["Gurbasch"] = "Farmine, Gnomprona, Kazordoon",
+  ["Brodrosch"] = "Cormaya, Farmine, Gnomprona",
+  ["Thorgrin"] = "Cormaya, Gnomprona, Kazordoon",
+  ["Imbul"] = "Centre, East",
+  ["Lorek"] = "Banuta, Chor, Mountain Pass, West",
+  ["Dalbrect"] = "Passage",
+  ["Nielson"] = "Folda, Senja, Vega",
+  ["Svenson"] = "Senja, Tibia, Vega",
+  ["Carlson"] = "Folda, Senja, Tibia",
+  ["Anderson"] = "Folda, Tibia, Vega",
+  ["Iyad"] = "Edron, Darashia, Farmine, Issavi, Kazordoon",
+  ["Buddel"] = "Okolnir, Svargrond, Tyrsung",
+  ["Harlow"] = "Vengoth, Yalahar"
+
+}
+
+local TravelWindow = setupUI([[
+UIWindow
+  !text: tr('Travel')
+  color: #99d6ff
+  font: sans-bold-16px  
+  background-color: black
+  opacity: 0.85
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.horizontalCenter: parent.horizontalCenter
+  size: 240 80
+
+  ComboBox
+    size: 220 20
+    id: travelOptions
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    text-align: center
+    opacity: 1.0
+    color: yellow
+    font: sans-bold-16px
+    margin-top: 25
+    
+  Button
+    id: closeButton
+    text: X
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    color: #99d6ff
+    size: 15 15
+    margin-bottom: 10
+    margin-right: 10
+]], g_ui.getRootWidget())
+
+TravelWindow:hide()
+
+NPC.talk = function(text)
+  if (g_game.getClientVersion() >= 810) then
+      NPC.say(text)
+  else
+    return say(text)
+  end
+end
+
+local setOptions = function(npc)
+  TravelWindow.travelOptions:clear()
+  local npcName = npc:getName()
+  local cities = NPCsAndCities[npcName]
+  TravelWindow.travelOptions:addOption(npcName)
+  for _, city in ipairs(cities:split(",")) do
+    TravelWindow.travelOptions:addOption(city:trim())
+  end
+end
+
+local setup = function(npc)    
+  setOptions(npc)
+  TravelWindow:show()
+end
+
+local reset = function()
+  TravelWindow:hide()
+  TravelWindow.travelOptions:clear()
+  modules.game_interface.getRootPanel():focus()
+end
+
+TravelWindow.travelOptions.onOptionChange = function(widget, option, data)
+  if TravelWindow:isVisible() then         
+    say("hi")
+    schedule(500, function()
+      NPC.talk(option)
+    end)
+    schedule(1000, function()
+      NPC.talk("yes")
+    end)
+    reset()
+  end
+end
+
+local getTravelNPC = function()
+  for name,_ in pairs(NPCsAndCities) do
+    local npc = getCreatureByName(name)
+    if npc and distanceFromPlayer(npc:getPosition()) <= 2 then
+      return npc
+    end
+  end
+end
+
+onPlayerPositionChange(function(old, new)
+  local npc = getTravelNPC()
+  if npc and not TravelWindow:isVisible() then
+    setup(npc)
+  elseif not npc and TravelWindow:isVisible() then
+    reset()
+  end
+end)
+
+tabs:setHeight(math.ceil(#tabs.tabs / 5)* 20)
+ for k,tab in ipairs(tabs.tabs) do
+    if math.fmod(k, 6) == 0 then
+        tab:mergeStyle({ ['$!first'] = { }})
+        tab:addAnchor(modules.corelib.AnchorTop, "prev", modules.corelib.AnchorBottom)
+        tab:addAnchor(modules.corelib.AnchorLeft, "parent", modules.corelib.AnchorLeft)
+    elseif k > 6 then
+        tab:mergeStyle({ ['$!first'] = { }})
+        tab:addAnchor(modules.corelib.AnchorTop, "prev", modules.corelib.AnchorTop)
+        tab:addAnchor(modules.corelib.AnchorLeft, "prev", modules.corelib.AnchorRight)
+    end   
+ end
+
+
+
+---- Pickup Nearby Tiles.
+
+
+function getNearTiles(pos)
+  if type(pos) ~= "table" then
+    pos = pos:getPosition() 
+  end
+
+  local tiles = {}
+  local dirs = {{-1, 1}, {0, 1}, {1, 1}, {-1, 0}, {1, 0}, {-1, -1}, {0, -1}, {1, -1}}
+  
+  for i = 1, #dirs do
+    local tile = g_map.getTile({ x = pos.x - dirs[i][1], y = pos.y - dirs[i][2], z = pos.z })
+    if tile then 
+      table.insert(tiles, tile) 
+    end
+  end
+  return tiles
+end
+
+function autoLootItemsFromTiles(tiles)
+  for _, tile in ipairs(tiles) do
+    for _, item in ipairs(tile:getItems()) do
+      if item:isPickupable() then
+        if g_game.move(item, {x=65535, y=SlotBack, z=0}, item:getCount()) then
+          delay(100)
+        end
+      end
+    end
+  end
+end
+
+macro(250, "Auto Loot Nearby", function()
+  local tiles = getNearTiles(pos())
+  autoLootItemsFromTiles(tiles)
+end)
+
+
+
+
+
+local talkToOberon = macro(1, 'Oberon', function() end)
+
+  onTalk(function(name, level, mode, text, channelId, pos)
+    if talkToOberon.isOff() then return end
+    if mode == 34 then
+        if string.find(text, "world will suffer for") then
+            say("Are you ever going to fight or do you prefer talking!")
+        elseif string.find(text, "feet when they see me") then
+            say("Even before they smell your breath?")
+        elseif string.find(text, "from this plane") then
+            say("Too bad you barely exist at all!") 
+        elseif string.find(text, "ESDO LO") then
+            say("SEHWO ASIMO, TOLIDO ESD!") 
+        elseif string.find(text, "will soon rule this world") then
+            say("Excuse me but I still do not get the message!") 
+        elseif string.find(text, "honourable and formidable") then
+            say("Then why are we fighting alone right now?") 
+        elseif string.find(text, "appear like a worm") then
+            say("How appropriate, you look like something worms already got the better of!") 
+        elseif string.find(text, "will be the end of mortal") then
+            say("Then let me show you the concept of mortality before it!") 
+        elseif string.find(text, "The true virtue of chivalry are my belief!") then
+            say("Dare strike up a Minnesang and you will receive your last accolade!") 
+        end
+    end
+  end)
+  
+  
+  
+  
+  -- rawpastebin XHqpdhbV
