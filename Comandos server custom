@@ -1,7 +1,0 @@
-    setDefaultTab("tools")
-
-    local function botPrintMessage(message)
-      modules.game_textmessage.displayGameMessage(message)
-    end
-    
-    botPrintMessage("SCRIPT AUTOLOOT ELIMINADO, ponte en contacto con el administrador")
